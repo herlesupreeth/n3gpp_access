@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "../include/v1_header.hpp"
+#include "v1_header.hpp"
 
 namespace gtp {
 
@@ -39,7 +39,7 @@ uint16_t GtpV1Header::GetLength() {
  return length_;
 }
 
-uint16_t GtpV1Header::SetLength(uint16_t length) {
+void GtpV1Header::SetLength(uint16_t length) {
 	length_ = length;
 }
 
@@ -47,7 +47,7 @@ uint32_t GtpV1Header::GetTeid() {
 	return teid_;
 }
 
-uint32_t GtpV1Header::SetTeid(uint32_t teid) {
+void GtpV1Header::SetTeid(uint32_t teid) {
 	teid_ = teid;
 }
 
@@ -58,7 +58,7 @@ uint16_t GtpV1Header::GetSequenceNumber() {
 	return 0;
 }
 
-uint16_t GtpV1Header::SetSequenceNumber(uint16_t seq_num) {
+void GtpV1Header::SetSequenceNumber(uint16_t seq_num) {
 	seq_num_ = seq_num;
 }
 

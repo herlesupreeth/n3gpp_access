@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.16)
-
-find_package(GTest REQUIRED)
-
 file(GLOB_RECURSE HDR_FILES *.hpp)
 file(GLOB_RECURSE SRC_FILES *.cpp)
 

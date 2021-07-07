@@ -1,4 +1,6 @@
+file(GLOB_RECURSE HDR_FILES *.hpp)
+
 ########################################################################
-# Add subdirectories
+# Install headers
 ########################################################################
-add_subdirectory(gtp)
+install(DIRECTORY ${HDR_FILES} DESTINATION include/gtp)

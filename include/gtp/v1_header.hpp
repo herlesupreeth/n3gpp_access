@@ -40,11 +40,11 @@ class GtpV1Header {
   ~GtpV1Header();
 
   uint16_t GetLength();
-  uint16_t SetLength(uint16_t length);
+  void SetLength(uint16_t length);
   uint32_t GetTeid();
-  uint32_t SetTeid(uint32_t teid);
+  void SetTeid(uint32_t teid);
   uint16_t GetSequenceNumber();
-  uint16_t SetSequenceNumber(uint16_t seq_num);
+  void SetSequenceNumber(uint16_t seq_num);
 
  private:
   uint8_t version_ : 3;
