@@ -1,19 +1,17 @@
 ########################################################################
-# Create gtp library
+# Create common library
 ########################################################################
 cmake_minimum_required(VERSION 3.16)
-project(gtp)
+project(common)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(${PROJECT_NAME}
-  v1_header.cpp
+  octet_buffer.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE common)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

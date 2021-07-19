@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include <string>
-#include <functional>
-#include <iostream>
 #include <optional>
 #include <cstdint>
-#include <boost/endian/arithmetic.hpp>
+#include <iostream>
+
+#include "octet_buffer.hpp"
 
 namespace gtp {
 
@@ -46,6 +45,9 @@ class GtpV1Header {
   uint16_t GetSequenceNumber();
   void SetSequenceNumber(uint16_t seq_num);
 
+  bool Encode(const GtpV1Header &hdr, OctetBuffer &buf);
+  bool Decode(const OctetBuffer &pdu, GtpV1Header &hdr);
+
  private:
   uint8_t version_ : 3;
   uint8_t pt_ : 1;
@@ -54,9 +56,9 @@ class GtpV1Header {
   uint8_t s_ : 1;
   uint8_t pn_ : 1;
   uint8_t message_type_;
-  boost::endian::big_uint16_t length_;
-  boost::endian::big_uint32_t teid_;
-  std::optional<boost::endian::big_uint16_t> seq_num_ = std::nullopt;
+  uint16_t length_;
+  uint32_t teid_;
+  std::optional<uint16_t> seq_num_ = std::nullopt;
   std::optional<uint8_t> n_pdu_num_ = std::nullopt;
   std::optional<uint8_t> nxt_ext_hdr_type_ = std::nullopt;
 };

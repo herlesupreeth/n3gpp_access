@@ -4,9 +4,6 @@
 #   test.cpp
 # )
 
-# target_link_libraries(${PROJECT_NAME}
-#   PRIVATE
-#     libs::gtp
-# )
+# target_link_libraries(${PROJECT_NAME} gtp)
 
 # add_test(gtp_tests ${PROJECT_NAME})
