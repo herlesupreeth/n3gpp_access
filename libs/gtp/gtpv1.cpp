@@ -6,7 +6,7 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#include "v1_header.hpp"
+#include "gtpv1.hpp"
 
 namespace gtp {
 
@@ -89,7 +89,15 @@ bool GtpV1Header::Decode(const OctetBuffer &pdu, GtpV1Header &hdr) {
 
   uint8_t flags = pdu.GetUint8(0);
   hdr.version_ = (flags >> 5) & 0x07;
+  if (hdr.version_ != 1) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported GTP version." << std::endl;
+  }
   hdr.pt_ = (flags >> 4) & 0x01;
+  if (hdr.pt_ != 1) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Invalid Protocol Type for GTP" << std::endl;
+  }
   hdr.reserved_ = 0x0;
   hdr.e_ = (flags >> 2) & 0x01;
   hdr.s_ = (flags >> 1) & 0x01;
@@ -106,9 +114,9 @@ bool GtpV1Header::Decode(const OctetBuffer &pdu, GtpV1Header &hdr) {
       return false;
     }
 
-    hdr.seq_num_ = pdu.GetBigEndianUint16(8);
-    n_pdu_num_ = pdu.GetUint8(10);
-    nxt_ext_hdr_type_ = pdu.GetUint8(11);
+    hdr.seq_num_ = hdr.s_ ? pdu.GetBigEndianUint16(8) : 0x00;
+    hdr.n_pdu_num_ = hdr.pn_ ? pdu.GetUint8(10) : 0x00;
+    hdr.nxt_ext_hdr_type_ = hdr.e_ ? pdu.GetUint8(11) : 0x00;
   }
 
   return true;
