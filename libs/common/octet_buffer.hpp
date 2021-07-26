@@ -9,12 +9,12 @@
 #pragma once
 
 #include <vector>
-#include<iterator>
+#include <iterator>
 #include <cstdint>
 
 class OctetBuffer {
  public:
-  typedef std::vector<uint8_t>::size_type size_type;
+  typedef std::vector<uint8_t>::size_type OctetBufferSizeType;
 
   OctetBuffer() : octet_() {}
   OctetBuffer(std::vector<uint8_t> &oct) : octet_(oct) {}
@@ -28,13 +28,13 @@ class OctetBuffer {
   void AppendLittleEndianUint32(uint32_t data);
 
   const std::vector<uint8_t> &GetOctets() const;
-  uint8_t GetUint8(size_type idx) const;
-  uint16_t GetBigEndianUint16(size_type idx) const;
-  uint32_t GetBigEndianUint32(size_type idx) const;
-  uint16_t GetLittleEndianUint16(size_type idx) const;
-  uint32_t GetLittleEndianUint32(size_type idx) const;
+  uint8_t GetUint8(OctetBuffer::OctetBufferSizeType idx) const;
+  uint16_t GetBigEndianUint16(OctetBuffer::OctetBufferSizeType idx) const;
+  uint32_t GetBigEndianUint32(OctetBuffer::OctetBufferSizeType idx) const;
+  uint16_t GetLittleEndianUint16(OctetBuffer::OctetBufferSizeType idx) const;
+  uint32_t GetLittleEndianUint32(OctetBuffer::OctetBufferSizeType idx) const;
 
-  size_type GetLength() const;
+  OctetBuffer::OctetBufferSizeType GetLength() const;
   bool IsEmpty() const;
 
  private:

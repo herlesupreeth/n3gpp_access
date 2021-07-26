@@ -44,35 +44,35 @@ const std::vector<uint8_t> &OctetBuffer::GetOctets() const {
   return octet_;
 }
 
-uint8_t OctetBuffer::GetUint8(size_type idx) const {
+uint8_t OctetBuffer::GetUint8(OctetBuffer::OctetBufferSizeType idx) const {
   return octet_.at(idx);
 }
 
-uint16_t OctetBuffer::GetBigEndianUint16(size_type idx) const {
+uint16_t OctetBuffer::GetBigEndianUint16(OctetBuffer::OctetBufferSizeType idx) const {
   return (static_cast<uint16_t>(octet_.at(idx + 1)) |
     (static_cast<uint16_t>(octet_.at(idx)) << 8));
 }
 
-uint32_t OctetBuffer::GetBigEndianUint32(size_type idx) const {
+uint32_t OctetBuffer::GetBigEndianUint32(OctetBuffer::OctetBufferSizeType idx) const {
   return (static_cast<uint32_t>(octet_.at(idx + 3)) |
     (static_cast<uint32_t>(octet_.at(idx + 2)) << 8) |
     (static_cast<uint32_t>(octet_.at(idx + 1)) << 16) |
     (static_cast<uint32_t>(octet_.at(idx + 0)) << 24));
 }
 
-uint16_t OctetBuffer::GetLittleEndianUint16(size_type idx) const {
+uint16_t OctetBuffer::GetLittleEndianUint16(OctetBuffer::OctetBufferSizeType idx) const {
   return (static_cast<uint16_t>(octet_.at(idx)) |
     (static_cast<uint16_t>(octet_.at(idx + 1)) << 8));
 }
 
-uint32_t OctetBuffer::GetLittleEndianUint32(size_type idx) const {
+uint32_t OctetBuffer::GetLittleEndianUint32(OctetBuffer::OctetBufferSizeType idx) const {
   return (static_cast<uint32_t>(octet_.at(idx)) |
     (static_cast<uint32_t>(octet_.at(idx + 1)) << 8) |
     (static_cast<uint32_t>(octet_.at(idx + 2)) << 16) |
     (static_cast<uint32_t>(octet_.at(idx + 3)) << 24));
 }
 
-OctetBuffer::size_type OctetBuffer::GetLength() const {
+OctetBuffer::OctetBuffer::OctetBufferSizeType OctetBuffer::GetLength() const {
   return static_cast<uint16_t>(octet_.size());
 }
 
