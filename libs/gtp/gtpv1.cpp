@@ -110,7 +110,7 @@ std::unique_ptr<GtpV1Hdr> GtpV1Hdr::Decode(const OctetBuffer &pdu,
     std::cout << "Invalid Protocol Type for GTP" << std::endl;
     return nullptr;
   }
-  // 8 Btyes mandtory header of GTPV1
+  // 8 Bytes mandtory header of GTPV1
   idx += 8;
 
   return std::make_unique<GtpV1Hdr>(static_cast<GtpMessageType>(
@@ -147,9 +147,10 @@ std::unique_ptr<GtpV1UdpPortExtHdr> GtpV1UdpPortExtHdr::Decode(const OctetBuffer
 
   uint8_t length = pdu.GetUint8(++idx);
   // Check for length
-  if (length != 1) {
+  if (length != 0x01) {
     // TODO: Replace with proper logging when available
     std::cout << "Invalid length for UDP Port Extension Header." << std::endl;
+    return nullptr;
   }
 
   return std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(++idx));
@@ -179,15 +180,61 @@ std::unique_ptr<GtpV1PdcpPduNumberExtHdr> GtpV1PdcpPduNumberExtHdr::Decode(
 
   uint8_t length = pdu.GetUint8(++idx);
   // Check for length
-  if (length != 1) {
+  if (length != 0x01) {
     // TODO: Replace with proper logging when available
-    std::cout << "Invalid length for UDP Port Extension Header." << std::endl;
+    std::cout << "Invalid length for PDCP PDU Number Extension Header." << std::endl;
+    return nullptr;
   }
   // 15 bits only
   uint16_t pdcp_pdu_num = pdu.GetBigEndianUint16(++idx);
   pdcp_pdu_num &= 0xEFFF;
+  // Increment index to point to Next Extension Header Type
+  ++idx;
 
   return std::make_unique<GtpV1PdcpPduNumberExtHdr>(pdcp_pdu_num);
+}
+
+// TODO:
+// GtpV1ExtHdrType::longPdcpPduNumber1 >= Release 15
+// GtpV1ExtHdrType::longPdcpPduNumber2 < Release 15
+GtpV1LongPdcpPduNumberExtHdr::GtpV1LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num)
+  : GtpV1ExtHdr(GtpV1ExtHdrType::longPdcpPduNumber1), l_pdcp_pdu_num_(l_pdcp_pdu_num) {}
+
+GtpV1LongPdcpPduNumberExtHdr::~GtpV1LongPdcpPduNumberExtHdr() {}
+
+bool GtpV1LongPdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(nxt_ext_hdr_type_);
+  // Length in 4 octets
+  buf.AppendUint8(0x02);
+  buf.AppendBigEndianUint24(l_pdcp_pdu_num_);
+  // 3 Bytes Spare
+  buf.AppendBigEndianUint24(0x00);
+  return true;
+}
+
+std::unique_ptr<GtpV1LongPdcpPduNumberExtHdr> GtpV1LongPdcpPduNumberExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+
+  if (pdu.GetLength() < (idx + 8)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t length = pdu.GetUint8(++idx);
+  // Check for length
+  if (length != 0x02) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Invalid length for Long PDCP PDU Number Extension Header." << std::endl;
+    return nullptr;
+  }
+  // 18 bits only
+  uint32_t l_pdcp_pdu_num = pdu.GetBigEndianUint24(++idx);
+  l_pdcp_pdu_num &= 0x00FFFFFF;
+  // Increment index to point to Next Extension Header Type
+  idx += 5;
+
+  return std::make_unique<GtpV1LongPdcpPduNumberExtHdr>(l_pdcp_pdu_num);
 }
 
 } // namespace gtp

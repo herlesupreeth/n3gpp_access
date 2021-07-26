@@ -117,7 +117,7 @@ class GtpV1PdcpPduNumberExtHdr : GtpV1ExtHdr {
 
  private:
   // 15 bits
-  uint16_t pdcp_pdu_num_;
+  uint16_t pdcp_pdu_num_ : 15;
 };
 
 class GtpV1LongPdcpPduNumberExtHdr : GtpV1ExtHdr {
@@ -131,7 +131,7 @@ class GtpV1LongPdcpPduNumberExtHdr : GtpV1ExtHdr {
 
  private:
   // 18 bits
-  uint16_t l_pdcp_pdu_num_;
+  uint32_t l_pdcp_pdu_num_ : 18;
 };
 
 class GtpV1Msg {
