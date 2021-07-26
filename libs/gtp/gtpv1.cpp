@@ -86,7 +86,7 @@ bool GtpV1Hdr::Encode(OctetBuffer &buf) const {
   return true;
 }
 
-GtpV1Hdr* GtpV1Hdr::Decode(const OctetBuffer &pdu,
+std::unique_ptr<GtpV1Hdr> GtpV1Hdr::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
 
   // Start with first byte at index 0
@@ -113,7 +113,7 @@ GtpV1Hdr* GtpV1Hdr::Decode(const OctetBuffer &pdu,
   // 8 Btyes mandtory header of GTPV1
   idx += 8;
 
-  return new GtpV1Hdr(static_cast<GtpMessageType>(
+  return std::make_unique<GtpV1Hdr>(static_cast<GtpMessageType>(
     pdu.GetUint8(1)), pdu.GetBigEndianUint32(4), flags, pdu.GetBigEndianUint16(2));
 }
 
@@ -136,7 +136,7 @@ bool GtpV1UdpPortExtHdr::Encode(OctetBuffer &buf) const {
   return true;
 }
 
-GtpV1UdpPortExtHdr* GtpV1UdpPortExtHdr::Decode(const OctetBuffer &pdu,
+std::unique_ptr<GtpV1UdpPortExtHdr> GtpV1UdpPortExtHdr::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
 
   if (pdu.GetLength() < (idx + 4)) {
@@ -152,7 +152,7 @@ GtpV1UdpPortExtHdr* GtpV1UdpPortExtHdr::Decode(const OctetBuffer &pdu,
     std::cout << "Invalid length for UDP Port Extension Header." << std::endl;
   }
 
-  return new GtpV1UdpPortExtHdr(pdu.GetBigEndianUint16(++idx));
+  return std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(++idx));
 }
 
 GtpV1PdcpPduNumberExtHdr::GtpV1PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num)
@@ -168,8 +168,8 @@ bool GtpV1PdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
   return true;
 }
 
-GtpV1PdcpPduNumberExtHdr* GtpV1PdcpPduNumberExtHdr::Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx) {
+std::unique_ptr<GtpV1PdcpPduNumberExtHdr> GtpV1PdcpPduNumberExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
 
   if (pdu.GetLength() < (idx + 4)) {
     // TODO: Replace with proper logging when available
@@ -187,7 +187,7 @@ GtpV1PdcpPduNumberExtHdr* GtpV1PdcpPduNumberExtHdr::Decode(const OctetBuffer &pd
   uint16_t pdcp_pdu_num = pdu.GetBigEndianUint16(++idx);
   pdcp_pdu_num &= 0xEFFF;
 
-  return new GtpV1PdcpPduNumberExtHdr(pdcp_pdu_num);
+  return std::make_unique<GtpV1PdcpPduNumberExtHdr>(pdcp_pdu_num);
 }
 
 } // namespace gtp

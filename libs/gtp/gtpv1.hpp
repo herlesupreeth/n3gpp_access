@@ -13,6 +13,7 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
+#include <memory>
 
 #include "octet_buffer.hpp"
 
@@ -56,7 +57,8 @@ class GtpV1Hdr {
   void UnsetNxtExtHeaderFlag();
 
   bool Encode(OctetBuffer &buf) const;
-  static GtpV1Hdr* Decode(const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
+  static std::unique_ptr<GtpV1Hdr> Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
 
  private:
   uint8_t flags_ = 0x30;
@@ -97,7 +99,7 @@ class GtpV1UdpPortExtHdr : GtpV1ExtHdr {
   ~GtpV1UdpPortExtHdr();
 
   bool Encode(OctetBuffer &buf) const;
-  static GtpV1UdpPortExtHdr* Decode(const OctetBuffer &pdu,
+  static std::unique_ptr<GtpV1UdpPortExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
  private:
@@ -110,11 +112,26 @@ class GtpV1PdcpPduNumberExtHdr : GtpV1ExtHdr {
   ~GtpV1PdcpPduNumberExtHdr();
 
   bool Encode(OctetBuffer &buf) const;
-  static GtpV1PdcpPduNumberExtHdr* Decode(const OctetBuffer &pdu,
+  static std::unique_ptr<GtpV1PdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
  private:
+  // 15 bits
   uint16_t pdcp_pdu_num_;
+};
+
+class GtpV1LongPdcpPduNumberExtHdr : GtpV1ExtHdr {
+ public:
+  GtpV1LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num);
+  ~GtpV1LongPdcpPduNumberExtHdr();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<GtpV1LongPdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ private:
+  // 18 bits
+  uint16_t l_pdcp_pdu_num_;
 };
 
 class GtpV1Msg {
