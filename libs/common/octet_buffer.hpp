@@ -11,6 +11,7 @@
 #include <vector>
 #include <iterator>
 #include <cstdint>
+#include <memory>
 
 class OctetBuffer {
  public:
@@ -21,25 +22,26 @@ class OctetBuffer {
   OctetBuffer(Octets &oct) : octet_(oct) {}
   ~OctetBuffer() {}
 
-  void AppendOctects(Octets &oct);
-  void AppendUint8(uint8_t data);
-  void AppendBigEndianUint16(uint16_t data);
-  void AppendBigEndianUint24(uint32_t data);
-  void AppendBigEndianUint32(uint32_t data);
-  void AppendLittleEndianUint16(uint16_t data);
-  void AppendLittleEndianUint24(uint32_t data);
-  void AppendLittleEndianUint32(uint32_t data);
+  bool CopyOctects(Octets &oct);
+  bool CopyOctects(Octets &oct, OctetBufferSizeType idx, OctetBufferSizeType size);
+  bool AppendUint8(uint8_t data);
+  bool AppendBigEndianUint16(uint16_t data);
+  bool AppendBigEndianUint24(uint32_t data);
+  bool AppendBigEndianUint32(uint32_t data);
+  bool AppendLittleEndianUint16(uint16_t data);
+  bool AppendLittleEndianUint24(uint32_t data);
+  bool AppendLittleEndianUint32(uint32_t data);
 
-  const Octets &GetOctets() const;
-  uint8_t GetUint8(OctetBuffer::OctetBufferSizeType idx) const;
-  uint16_t GetBigEndianUint16(OctetBuffer::OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint24(OctetBuffer::OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint32(OctetBuffer::OctetBufferSizeType idx) const;
-  uint16_t GetLittleEndianUint16(OctetBuffer::OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint24(OctetBuffer::OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint32(OctetBuffer::OctetBufferSizeType idx) const;
+  const std::unique_ptr<OctetBuffer::Octets> GetOctets() const;
+  uint8_t GetUint8(OctetBufferSizeType idx) const;
+  uint16_t GetBigEndianUint16(OctetBufferSizeType idx) const;
+  uint32_t GetBigEndianUint24(OctetBufferSizeType idx) const;
+  uint32_t GetBigEndianUint32(OctetBufferSizeType idx) const;
+  uint16_t GetLittleEndianUint16(OctetBufferSizeType idx) const;
+  uint32_t GetLittleEndianUint24(OctetBufferSizeType idx) const;
+  uint32_t GetLittleEndianUint32(OctetBufferSizeType idx) const;
 
-  OctetBuffer::OctetBufferSizeType GetLength() const;
+  OctetBufferSizeType GetLength() const;
   bool IsEmpty() const;
 
  private:
