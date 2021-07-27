@@ -147,6 +147,21 @@ class GtpV1ServiceClassIndicatorExtHdr : GtpV1ExtHdr {
   uint8_t sci_;
 };
 
+class GtpV1RanContainerExtHdr : GtpV1ExtHdr {
+ public:
+  GtpV1RanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container, OctetBuffer::OctetBufferSizeType start_idx,
+    OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1RanContainerExtHdr();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<GtpV1RanContainerExtHdr> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ private:
+  OctetBuffer ran_container_;
+};
+
 class GtpV1Msg {
  public:
   uint16_t GetSequenceNumber();

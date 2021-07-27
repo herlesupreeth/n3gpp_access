@@ -88,7 +88,6 @@ bool GtpV1Hdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<GtpV1Hdr> GtpV1Hdr::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
-
   // Start with first byte at index 0
   idx = 0;
   if (pdu.GetLength() < 8) {
@@ -141,22 +140,28 @@ bool GtpV1UdpPortExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<GtpV1UdpPortExtHdr> GtpV1UdpPortExtHdr::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
 
-  if (pdu.GetLength() < (idx + 4)) {
+  if (pdu.GetLength() < (idx + 5)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
   }
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::udpPort)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
 
-  uint8_t length = pdu.GetUint8(++idx);
+  uint8_t length = pdu.GetUint8(idx + 1);
   // Check for length
   if (length != 0x01) {
     // TODO: Replace with proper logging when available
     std::cout << "Invalid length for UDP Port Extension Header." << std::endl;
     return nullptr;
   }
-  auto res = std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(++idx));
+  auto res = std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(idx + 2));
   // Increment index to point to Next Extension Header Type
-  ++idx;
+  idx += 4;
 
   return res;
 }
@@ -177,13 +182,20 @@ bool GtpV1PdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<GtpV1PdcpPduNumberExtHdr> GtpV1PdcpPduNumberExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
 
-  if (pdu.GetLength() < (idx + 4)) {
+  if (pdu.GetLength() < (idx + 5)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
   }
 
-  uint8_t length = pdu.GetUint8(++idx);
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::pdcpPduNumber)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t length = pdu.GetUint8(idx + 1);
   // Check for length
   if (length != 0x01) {
     // TODO: Replace with proper logging when available
@@ -191,15 +203,15 @@ std::unique_ptr<GtpV1PdcpPduNumberExtHdr> GtpV1PdcpPduNumberExtHdr::Decode(
     return nullptr;
   }
   // 15 bits only
-  uint16_t pdcp_pdu_num = pdu.GetBigEndianUint16(++idx);
+  uint16_t pdcp_pdu_num = pdu.GetBigEndianUint16(idx + 2);
   pdcp_pdu_num &= 0xEFFF;
   // Increment index to point to Next Extension Header Type
-  ++idx;
+  idx += 4;
 
   return std::make_unique<GtpV1PdcpPduNumberExtHdr>(pdcp_pdu_num);
 }
 
-// TODO:
+// TODO: Support Release < 15
 // GtpV1ExtHdrType::longPdcpPduNumber1 >= Release 15
 // GtpV1ExtHdrType::longPdcpPduNumber2 < Release 15
 GtpV1LongPdcpPduNumberExtHdr::GtpV1LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num)
@@ -220,13 +232,20 @@ bool GtpV1LongPdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<GtpV1LongPdcpPduNumberExtHdr> GtpV1LongPdcpPduNumberExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
 
-  if (pdu.GetLength() < (idx + 8)) {
+  if (pdu.GetLength() < (idx + 9)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
   }
 
-  uint8_t length = pdu.GetUint8(++idx);
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::longPdcpPduNumber1)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t length = pdu.GetUint8(idx + 1);
   // Check for length
   if (length != 0x02) {
     // TODO: Replace with proper logging when available
@@ -234,10 +253,10 @@ std::unique_ptr<GtpV1LongPdcpPduNumberExtHdr> GtpV1LongPdcpPduNumberExtHdr::Deco
     return nullptr;
   }
   // 18 bits only
-  uint32_t l_pdcp_pdu_num = pdu.GetBigEndianUint24(++idx);
+  uint32_t l_pdcp_pdu_num = pdu.GetBigEndianUint24(idx + 2);
   l_pdcp_pdu_num &= 0x00FFFFFF;
   // Increment index to point to Next Extension Header Type
-  idx += 5;
+  idx += 8;
 
   return std::make_unique<GtpV1LongPdcpPduNumberExtHdr>(l_pdcp_pdu_num);
 }
@@ -260,22 +279,80 @@ bool GtpV1ServiceClassIndicatorExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<GtpV1ServiceClassIndicatorExtHdr> GtpV1ServiceClassIndicatorExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
 
-  if (pdu.GetLength() < (idx + 4)) {
+  if (pdu.GetLength() < (idx + 5)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
   }
 
-  uint8_t length = pdu.GetUint8(++idx);
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::serviceClassIndicator)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t length = pdu.GetUint8(idx + 1);
   // Check for length
   if (length != 0x01) {
     // TODO: Replace with proper logging when available
     std::cout << "Invalid length for Service Class Indicator Extension Header." << std::endl;
     return nullptr;
   }
-  auto res = std::make_unique<GtpV1ServiceClassIndicatorExtHdr>(pdu.GetUint8(++idx));
+  auto res = std::make_unique<GtpV1ServiceClassIndicatorExtHdr>(pdu.GetUint8(idx + 2));
   // Increment index to point to Next Extension Header Type
-  ++idx;
+  idx += 4;
+
+  return res;
+}
+
+GtpV1RanContainerExtHdr::GtpV1RanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container, OctetBuffer::OctetBufferSizeType start_idx,
+    OctetBuffer::OctetBufferSizeType size)
+  : GtpV1ExtHdr(GtpV1ExtHdrType::ranContainer) {
+  ran_container_.CopyOctects(ran_container, start_idx, size);
+}
+
+GtpV1RanContainerExtHdr::~GtpV1RanContainerExtHdr() {}
+
+bool GtpV1RanContainerExtHdr::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(nxt_ext_hdr_type_);
+  // Length in 4 octets
+  buf.AppendUint8((3 - ran_container_.GetLength()) / 4);
+  buf.CopyOctects(ran_container_.GetOctets());
+  return true;
+}
+
+std::unique_ptr<GtpV1RanContainerExtHdr> GtpV1RanContainerExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+  // Check for atleast Extension Header Type + length byte
+  if (pdu.GetLength() < (idx + 2)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::ranContainer)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t n = pdu.GetUint8(idx + 1);
+  OctetBuffer::OctetBufferSizeType ran_cont_size = 2 * ((4 * n) - 1);
+  // Check for PDU length
+  if (pdu.GetLength() < (idx + ran_cont_size + 1)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+  auto res = std::make_unique<GtpV1RanContainerExtHdr>(
+                                pdu.GetOctets(),
+                                idx + 2,
+                                ran_cont_size + 1);
+  // Increment index to point to Next Extension Header Type
+  idx += ran_cont_size + 2;
 
   return res;
 }
