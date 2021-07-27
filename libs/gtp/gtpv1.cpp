@@ -11,7 +11,7 @@
 namespace gtp {
 
 GtpV1Hdr::GtpV1Hdr(GtpMessageType message_type, uint32_t teid, uint8_t flags,
-              uint16_t length)
+    uint16_t length)
   : teid_(teid), length_(length), flags_(flags) {
   message_type_ = static_cast<uint8_t>(message_type);
 }
@@ -97,7 +97,7 @@ std::unique_ptr<GtpV1Hdr> GtpV1Hdr::Decode(const OctetBuffer &pdu,
     return nullptr;
   }
 
-  uint8_t flags = pdu.GetUint8(0);
+  uint8_t flags = pdu.GetUint8(idx);
   // Check the GTP version decoded from PDU
   if (((flags >> 5) & 0x07) != 1) {
     // TODO: Replace with proper logging when available
@@ -110,11 +110,13 @@ std::unique_ptr<GtpV1Hdr> GtpV1Hdr::Decode(const OctetBuffer &pdu,
     std::cout << "Invalid Protocol Type for GTP" << std::endl;
     return nullptr;
   }
+  auto res = std::make_unique<GtpV1Hdr>(
+    static_cast<GtpMessageType>(pdu.GetUint8(idx + 1)),
+    pdu.GetBigEndianUint32(idx + 4), flags, pdu.GetBigEndianUint16(idx + 2));
   // 8 Bytes mandtory header of GTPV1
   idx += 8;
 
-  return std::make_unique<GtpV1Hdr>(static_cast<GtpMessageType>(
-    pdu.GetUint8(1)), pdu.GetBigEndianUint32(4), flags, pdu.GetBigEndianUint16(2));
+  return res;
 }
 
 GtpV1ExtHdr::GtpV1ExtHdr(GtpV1ExtHdrType ext_type) {
@@ -152,8 +154,11 @@ std::unique_ptr<GtpV1UdpPortExtHdr> GtpV1UdpPortExtHdr::Decode(const OctetBuffer
     std::cout << "Invalid length for UDP Port Extension Header." << std::endl;
     return nullptr;
   }
+  auto res = std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(++idx));
+  // Increment index to point to Next Extension Header Type
+  ++idx;
 
-  return std::make_unique<GtpV1UdpPortExtHdr>(pdu.GetBigEndianUint16(++idx));
+  return res;
 }
 
 GtpV1PdcpPduNumberExtHdr::GtpV1PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num)
@@ -235,6 +240,44 @@ std::unique_ptr<GtpV1LongPdcpPduNumberExtHdr> GtpV1LongPdcpPduNumberExtHdr::Deco
   idx += 5;
 
   return std::make_unique<GtpV1LongPdcpPduNumberExtHdr>(l_pdcp_pdu_num);
+}
+
+GtpV1ServiceClassIndicatorExtHdr::GtpV1ServiceClassIndicatorExtHdr(uint8_t sci)
+  : GtpV1ExtHdr(GtpV1ExtHdrType::serviceClassIndicator), sci_(sci) {}
+
+GtpV1ServiceClassIndicatorExtHdr::~GtpV1ServiceClassIndicatorExtHdr() {}
+
+bool GtpV1ServiceClassIndicatorExtHdr::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(nxt_ext_hdr_type_);
+  // Length in 4 octets
+  buf.AppendUint8(0x01);
+  buf.AppendUint8(sci_);
+  // Spare
+  buf.AppendUint8(0x00);
+  return true;
+}
+
+std::unique_ptr<GtpV1ServiceClassIndicatorExtHdr> GtpV1ServiceClassIndicatorExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+
+  if (pdu.GetLength() < (idx + 4)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t length = pdu.GetUint8(++idx);
+  // Check for length
+  if (length != 0x01) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Invalid length for Service Class Indicator Extension Header." << std::endl;
+    return nullptr;
+  }
+  auto res = std::make_unique<GtpV1ServiceClassIndicatorExtHdr>(pdu.GetUint8(++idx));
+  // Increment index to point to Next Extension Header Type
+  ++idx;
+
+  return res;
 }
 
 } // namespace gtp

@@ -134,6 +134,19 @@ class GtpV1LongPdcpPduNumberExtHdr : GtpV1ExtHdr {
   uint32_t l_pdcp_pdu_num_ : 18;
 };
 
+class GtpV1ServiceClassIndicatorExtHdr : GtpV1ExtHdr {
+ public:
+  GtpV1ServiceClassIndicatorExtHdr(uint8_t sci);
+  ~GtpV1ServiceClassIndicatorExtHdr();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<GtpV1ServiceClassIndicatorExtHdr> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ private:
+  uint8_t sci_;
+};
+
 class GtpV1Msg {
  public:
   uint16_t GetSequenceNumber();
