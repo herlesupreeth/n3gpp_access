@@ -306,16 +306,16 @@ std::unique_ptr<GtpV1ServiceClassIndicatorExtHdr> GtpV1ServiceClassIndicatorExtH
   return res;
 }
 
-GtpV1RanContainerExtHdr::GtpV1RanContainerExtHdr(
-    const OctetBuffer::Octets &ran_container, OctetBuffer::OctetBufferSizeType start_idx,
-    OctetBuffer::OctetBufferSizeType size)
-  : GtpV1ExtHdr(GtpV1ExtHdrType::ranContainer) {
+GtpV1BaseRanContainerExtHdr::GtpV1BaseRanContainerExtHdr(
+    GtpV1ExtHdrType ran_container_type, const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size)
+  : GtpV1ExtHdr(ran_container_type) {
   ran_container_.CopyOctects(ran_container, start_idx, size);
 }
 
-GtpV1RanContainerExtHdr::~GtpV1RanContainerExtHdr() {}
+GtpV1BaseRanContainerExtHdr::~GtpV1BaseRanContainerExtHdr() {}
 
-bool GtpV1RanContainerExtHdr::Encode(OctetBuffer &buf) const {
+bool GtpV1BaseRanContainerExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8((3 - ran_container_.GetLength()) / 4);
@@ -323,8 +323,9 @@ bool GtpV1RanContainerExtHdr::Encode(OctetBuffer &buf) const {
   return true;
 }
 
-std::unique_ptr<GtpV1RanContainerExtHdr> GtpV1RanContainerExtHdr::Decode(
-    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+std::unique_ptr<GtpV1BaseRanContainerExtHdr> GtpV1BaseRanContainerExtHdr::Decode(
+    GtpV1ExtHdrType ran_container_type, const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx) {
   // Check for atleast Extension Header Type + length byte
   if (pdu.GetLength() < (idx + 2)) {
     // TODO: Replace with proper logging when available
@@ -333,7 +334,7 @@ std::unique_ptr<GtpV1RanContainerExtHdr> GtpV1RanContainerExtHdr::Decode(
   }
 
   // Check for Extension header type
-  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::ranContainer)) {
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(ran_container_type)) {
     // TODO: Replace with proper logging when available
     std::cout << "Unsupported Extension Header Type." << std::endl;
     return nullptr;
@@ -347,13 +348,62 @@ std::unique_ptr<GtpV1RanContainerExtHdr> GtpV1RanContainerExtHdr::Decode(
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
   }
-  auto res = std::make_unique<GtpV1RanContainerExtHdr>(
+  auto res = std::make_unique<GtpV1BaseRanContainerExtHdr>(
+                                ran_container_type,
                                 pdu.GetOctets(),
                                 idx + 2,
                                 ran_cont_size + 1);
   // Increment index to point to Next Extension Header Type
   idx += ran_cont_size + 2;
 
+  return res;
+}
+
+GtpV1RanContainerExtHdr::GtpV1RanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size)
+  : GtpV1BaseRanContainerExtHdr(GtpV1ExtHdrType::ranContainer,
+                                ran_container, start_idx, size) {}
+
+GtpV1RanContainerExtHdr::~GtpV1RanContainerExtHdr() {}
+
+std::unique_ptr<GtpV1RanContainerExtHdr> GtpV1RanContainerExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+  auto res = std::unique_ptr<GtpV1RanContainerExtHdr>(
+    static_cast<GtpV1RanContainerExtHdr*>(GtpV1BaseRanContainerExtHdr::Decode(
+      GtpV1ExtHdrType::ranContainer, pdu, idx).release()));
+  return res;
+}
+
+GtpV1XwRanContainerExtHdr::GtpV1XwRanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size)
+  : GtpV1BaseRanContainerExtHdr(GtpV1ExtHdrType::xwRanContainer,
+                                ran_container, start_idx, size) {}
+
+GtpV1XwRanContainerExtHdr::~GtpV1XwRanContainerExtHdr() {}
+
+std::unique_ptr<GtpV1XwRanContainerExtHdr> GtpV1XwRanContainerExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+  auto res = std::unique_ptr<GtpV1XwRanContainerExtHdr>(
+    static_cast<GtpV1XwRanContainerExtHdr*>(GtpV1BaseRanContainerExtHdr::Decode(
+      GtpV1ExtHdrType::xwRanContainer, pdu, idx).release()));
+  return res;
+}
+
+GtpV1NrRanContainerExtHdr::GtpV1NrRanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size)
+  : GtpV1BaseRanContainerExtHdr(GtpV1ExtHdrType::nrRanContainer,
+                                ran_container, start_idx, size) {}
+
+GtpV1NrRanContainerExtHdr::~GtpV1NrRanContainerExtHdr() {}
+
+std::unique_ptr<GtpV1NrRanContainerExtHdr> GtpV1NrRanContainerExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+  auto res = std::unique_ptr<GtpV1NrRanContainerExtHdr>(
+    static_cast<GtpV1NrRanContainerExtHdr*>(GtpV1BaseRanContainerExtHdr::Decode(
+      GtpV1ExtHdrType::nrRanContainer, pdu, idx).release()));
   return res;
 }
 

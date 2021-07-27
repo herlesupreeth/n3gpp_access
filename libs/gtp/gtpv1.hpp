@@ -147,19 +147,53 @@ class GtpV1ServiceClassIndicatorExtHdr : GtpV1ExtHdr {
   uint8_t sci_;
 };
 
-class GtpV1RanContainerExtHdr : GtpV1ExtHdr {
+class GtpV1BaseRanContainerExtHdr : GtpV1ExtHdr {
  public:
-  GtpV1RanContainerExtHdr(
-    const OctetBuffer::Octets &ran_container, OctetBuffer::OctetBufferSizeType start_idx,
-    OctetBuffer::OctetBufferSizeType size);
-  ~GtpV1RanContainerExtHdr();
+  GtpV1BaseRanContainerExtHdr(
+    GtpV1ExtHdrType ran_container_type, const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1BaseRanContainerExtHdr();
 
   bool Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<GtpV1RanContainerExtHdr> Decode(const OctetBuffer &pdu,
+  static std::unique_ptr<GtpV1BaseRanContainerExtHdr> Decode(
+    GtpV1ExtHdrType ran_container_type, const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
- private:
+ protected:
   OctetBuffer ran_container_;
+};
+
+class GtpV1RanContainerExtHdr : public GtpV1BaseRanContainerExtHdr {
+ public:
+  GtpV1RanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1RanContainerExtHdr();
+
+  static std::unique_ptr<GtpV1RanContainerExtHdr> Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
+};
+
+class GtpV1XwRanContainerExtHdr : GtpV1BaseRanContainerExtHdr {
+ public:
+  GtpV1XwRanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1XwRanContainerExtHdr();
+
+  static std::unique_ptr<GtpV1XwRanContainerExtHdr> Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
+};
+
+class GtpV1NrRanContainerExtHdr : GtpV1BaseRanContainerExtHdr {
+ public:
+  GtpV1NrRanContainerExtHdr(
+    const OctetBuffer::Octets &ran_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1NrRanContainerExtHdr();
+
+  static std::unique_ptr<GtpV1NrRanContainerExtHdr> Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
 };
 
 class GtpV1Msg {
