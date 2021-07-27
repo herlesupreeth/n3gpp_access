@@ -8,13 +8,12 @@
 
 #include "octet_buffer.hpp"
 
-bool OctetBuffer::CopyOctects(OctetBuffer::Octets &oct) {
+bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct) {
   octet_.insert(octet_.end(), oct.cbegin(), oct.cend());
   return true;
 }
 
-// TODO: Size check
-bool OctetBuffer::CopyOctects(OctetBuffer::Octets &oct,
+bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct,
     OctetBuffer::OctetBufferSizeType idx, OctetBuffer::OctetBufferSizeType size) {
   if ((oct.cbegin() + idx + size) > oct.cend()) {
     return false;  
@@ -72,8 +71,8 @@ bool OctetBuffer::AppendLittleEndianUint32(uint32_t data) {
   return true;
 }
 
-const std::unique_ptr<OctetBuffer::Octets> OctetBuffer::GetOctets() const {
-  return std::make_unique<OctetBuffer::Octets>(octet_);
+const OctetBuffer::Octets& OctetBuffer::GetOctets() const {
+  return octet_;
 }
 
 uint8_t OctetBuffer::GetUint8(OctetBuffer::OctetBufferSizeType idx) const {
