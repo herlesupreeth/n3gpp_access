@@ -48872,7 +48872,10 @@ static asn_TYPE_member_t asn_MBR_Ngap_extensionValue_648[] = {
 			0,
 #endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */
 #if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)
-			&asn_PER_memb_Ngap_OCTET_STRING_CONTAINING_PDUSessionResourceReleaseResponseTransfer__constr_45,
+			/* Modified by Supreeth 
+			 * Original value: &asn_PER_memb_Ngap_OCTET_STRING_CONTAINING_PDUSessionResourceReleaseResponseTransfer__constr_45
+			 */
+			0,
 #endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */
 			memb_Ngap_OCTET_STRING_CONTAINING_PDUSessionResourceReleaseResponseTransfer__constraint_648
 		},
