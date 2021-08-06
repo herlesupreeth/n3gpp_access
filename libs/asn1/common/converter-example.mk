@@ -1,12 +1,12 @@
-include ngap/Makefile.am.libasncodec
+include ./ngap/Makefile.am.libasncodec
 
 LIBS += -lm
-CFLAGS += $(ASN_MODULE_CFLAGS) -DASN_DISABLE_BER_SUPPORT -DASN_DISABLE_XER_SUPPORT -DASN_DISABLE_OER_SUPPORT -DASN_DISABLE_UPER_SUPPORT -DASN_PDU_COLLECTION -I.
+CFLAGS += $(ASN_MODULE_CFLAGS) -DASN_PDU_COLLECTION -I.
 ASN_LIBRARY ?= libasncodec.a
 ASN_PROGRAM ?= converter-example
 ASN_PROGRAM_SRCS ?= \
-	ngap/converter-example.c\
-	ngap/pdu_collection.c
+	./ngap/converter-example.c\
+	./ngap/pdu_collection.c
 
 all: $(ASN_PROGRAM)
 
@@ -29,5 +29,5 @@ clean:
 regen: regenerate-from-asn1-source
 
 regenerate-from-asn1-source:
-	asn1c -pdu=all -fcompound-names -findirect-choice -fno-include-deps -no-gen-BER -no-gen-XER -no-gen-OER -no-gen-UPER -D ngap asn1/NGAP_Common Definitions.asn1 asn1/NGAP_Constant Definitions.asn1 asn1/NGAP_Container Definitions.asn1 asn1/NGAP_Elementary Procedure Definitions.asn1 asn1/NGAP_Information Element Definitions.asn1 asn1/NGAP_PDU Definitions.asn1
+	asn1c -pdu=all -fcompound-names -findirect-choice -fno-include-deps -D ./ngap/ ./asn1//NGAP_Common Definitions.asn1 ./asn1//NGAP_Constant Definitions.asn1 ./asn1//NGAP_Container Definitions.asn1 ./asn1//NGAP_Elementary Procedure Definitions.asn1 ./asn1//NGAP_Information Element Definitions.asn1 ./asn1//NGAP_PDU Definitions.asn1
 

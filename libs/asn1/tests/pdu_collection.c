@@ -438,6 +438,7 @@ extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceInformationLi
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceInformationItem;
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceListCxtRelCpl;
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceItemCxtRelCpl;
+extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceReleaseResponseTransfer_OCTET_STRING;
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceListCxtRelReq;
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceItemCxtRelReq;
 extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_PDUSessionResourceListHORqd;
@@ -856,7 +857,7 @@ extern struct asn_TYPE_descriptor_s asn_DEF_Ngap_EXTERNAL;
 
 
 struct asn_TYPE_descriptor_s *asn_pdu_collection[] = {
-	/* From module NGAP-CommonDataTypes in asn1/NGAP_Common Definitions.asn1 */
+	/* From module NGAP-CommonDataTypes in ./asn1//NGAP_Common Definitions.asn1 */
 	&asn_DEF_Ngap_Criticality,	
 	&asn_DEF_Ngap_Presence,	
 	&asn_DEF_Ngap_PrivateIE_ID,	
@@ -864,12 +865,12 @@ struct asn_TYPE_descriptor_s *asn_pdu_collection[] = {
 	&asn_DEF_Ngap_ProtocolExtensionID,	
 	&asn_DEF_Ngap_ProtocolIE_ID,	
 	&asn_DEF_Ngap_TriggeringMessage,	
-	/* From module NGAP-PDU-Descriptions in asn1/NGAP_Elementary Procedure Definitions.asn1 */
+	/* From module NGAP-PDU-Descriptions in ./asn1//NGAP_Elementary Procedure Definitions.asn1 */
 	&asn_DEF_Ngap_NGAP_PDU,	
 	&asn_DEF_Ngap_InitiatingMessage,	
 	&asn_DEF_Ngap_SuccessfulOutcome,	
 	&asn_DEF_Ngap_UnsuccessfulOutcome,	
-	/* From module NGAP-IEs in asn1/NGAP_Information Element Definitions.asn1 */
+	/* From module NGAP-IEs in ./asn1//NGAP_Information Element Definitions.asn1 */
 	&asn_DEF_Ngap_AdditionalDLUPTNLInformationForHOList,	
 	&asn_DEF_Ngap_AdditionalDLUPTNLInformationForHOItem,	
 	&asn_DEF_Ngap_AdditionalQosFlowInformation,	
@@ -1293,6 +1294,7 @@ struct asn_TYPE_descriptor_s *asn_pdu_collection[] = {
 	&asn_DEF_Ngap_PDUSessionResourceInformationItem,	
 	&asn_DEF_Ngap_PDUSessionResourceListCxtRelCpl,	
 	&asn_DEF_Ngap_PDUSessionResourceItemCxtRelCpl,	
+	&asn_DEF_Ngap_PDUSessionResourceReleaseResponseTransfer_OCTET_STRING,	
 	&asn_DEF_Ngap_PDUSessionResourceListCxtRelReq,	
 	&asn_DEF_Ngap_PDUSessionResourceItemCxtRelReq,	
 	&asn_DEF_Ngap_PDUSessionResourceListHORqd,	
@@ -1610,7 +1612,7 @@ struct asn_TYPE_descriptor_s *asn_pdu_collection[] = {
 	&asn_DEF_Ngap_XnGTP_TLAs,	
 	&asn_DEF_Ngap_XnTLAs,	
 	&asn_DEF_Ngap_XnTNLConfigurationInfo,	
-	/* From module NGAP-PDU-Contents in asn1/NGAP_PDU Definitions.asn1 */
+	/* From module NGAP-PDU-Contents in ./asn1//NGAP_PDU Definitions.asn1 */
 	&asn_DEF_Ngap_PDUSessionResourceSetupRequest,	
 	&asn_DEF_Ngap_PDUSessionResourceSetupResponse,	
 	&asn_DEF_Ngap_PDUSessionResourceReleaseCommand,	
