@@ -7,6 +7,7 @@
 # and subject to the terms and conditions defined in LICENSE file.
 
 # Install ASN1 Compile from following link https://github.com/mouse07410/asn1c
+# Example: ./generate_from_asn1.sh -o "./ngap/" -i "./asn1/" -p Ngap
 
 set -e
 
@@ -55,14 +56,12 @@ echo "PREFIX=$PREFIX"
 
 export ASN1C_PREFIX=$PREFIX
 
+mkdir -p $OUTPUT_DIR
+
 asn1c \
   -pdu=all \
   -fcompound-names \
   -findirect-choice \
   -fno-include-deps \
-  -no-gen-BER \
-  -no-gen-XER \
-  -no-gen-OER \
-  -no-gen-UPER \
   -D $OUTPUT_DIR \
   $INPUT_DIR/*.asn1
