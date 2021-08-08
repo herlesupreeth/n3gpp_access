@@ -407,4 +407,55 @@ std::unique_ptr<GtpV1NrRanContainerExtHdr> GtpV1NrRanContainerExtHdr::Decode(
   return res;
 }
 
+GtpV1PduSessionContainerExtHdr::GtpV1PduSessionContainerExtHdr(
+    const OctetBuffer::Octets &pdu_sess_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size)
+  : GtpV1ExtHdr(GtpV1ExtHdrType::pduSessionContainer) {
+  pdu_sess_container_.CopyOctects(pdu_sess_container, start_idx, size);
+}
+
+GtpV1PduSessionContainerExtHdr::~GtpV1PduSessionContainerExtHdr() {}
+
+bool GtpV1PduSessionContainerExtHdr::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(nxt_ext_hdr_type_);
+  // Length in 4 octets
+  buf.AppendUint8((3 - pdu_sess_container_.GetLength()) / 4);
+  buf.CopyOctects(pdu_sess_container_.GetOctets());
+  return true;
+}
+
+std::unique_ptr<GtpV1PduSessionContainerExtHdr> GtpV1PduSessionContainerExtHdr::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+  // Check for atleast Extension Header Type + length byte
+  if (pdu.GetLength() < (idx + 2)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+
+  // Check for Extension header type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(GtpV1ExtHdrType::pduSessionContainer)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Extension Header Type." << std::endl;
+    return nullptr;
+  }
+
+  uint8_t n = pdu.GetUint8(idx + 1);
+  OctetBuffer::OctetBufferSizeType pdu_sess_cont_size = 2 * ((4 * n) - 1);
+  // Check for PDU length
+  if (pdu.GetLength() < (idx + pdu_sess_cont_size + 1)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+  auto res = std::make_unique<GtpV1PduSessionContainerExtHdr>(
+                                pdu.GetOctets(),
+                                idx + 2,
+                                pdu_sess_cont_size + 1);
+  // Increment index to point to Next Extension Header Type
+  idx += pdu_sess_cont_size + 2;
+
+  return res;
+}
+
 } // namespace gtp

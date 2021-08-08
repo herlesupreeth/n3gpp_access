@@ -196,6 +196,20 @@ class GtpV1NrRanContainerExtHdr : GtpV1BaseRanContainerExtHdr {
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
 };
 
+class GtpV1PduSessionContainerExtHdr : GtpV1ExtHdr {
+ public:
+  GtpV1PduSessionContainerExtHdr(const OctetBuffer::Octets &pdu_sess_container,
+    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+  ~GtpV1PduSessionContainerExtHdr();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<GtpV1PduSessionContainerExtHdr> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ protected:
+  OctetBuffer pdu_sess_container_;
+};
+
 class GtpV1Msg {
  public:
   uint16_t GetSequenceNumber();
