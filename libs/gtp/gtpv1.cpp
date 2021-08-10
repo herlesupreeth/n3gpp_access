@@ -88,9 +88,8 @@ bool Header::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
-  // Start with first byte at index 0
-  idx = 0;
-  if (pdu.GetLength() < 8) {
+
+  if (pdu.GetLength() < (idx + 7)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -139,8 +138,8 @@ bool UdpPortExtHdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<UdpPortExtHdr> UdpPortExtHdr::Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
-
-  if (pdu.GetLength() < (idx + 5)) {
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 4)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -181,8 +180,8 @@ bool PdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<PdcpPduNumberExtHdr> PdcpPduNumberExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
-
-  if (pdu.GetLength() < (idx + 5)) {
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 4)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -231,8 +230,8 @@ bool LongPdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<LongPdcpPduNumberExtHdr> LongPdcpPduNumberExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
-
-  if (pdu.GetLength() < (idx + 9)) {
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 8)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -278,8 +277,8 @@ bool ServiceClassIndicatorExtHdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<ServiceClassIndicatorExtHdr> ServiceClassIndicatorExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
-
-  if (pdu.GetLength() < (idx + 5)) {
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 4)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -327,7 +326,7 @@ std::unique_ptr<BaseRanContainerExtHdr> BaseRanContainerExtHdr::Decode(
     ExtHdrType ran_container_type, const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx) {
   // Check for atleast Extension Header Type + length byte
-  if (pdu.GetLength() < (idx + 2)) {
+  if (pdu.GetLength() < (idx + 1)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -341,9 +340,9 @@ std::unique_ptr<BaseRanContainerExtHdr> BaseRanContainerExtHdr::Decode(
   }
 
   uint8_t n = pdu.GetUint8(idx + 1);
-  OctetBuffer::OctetBufferSizeType ran_cont_size = 2 * ((4 * n) - 1);
-  // Check for PDU length
-  if (pdu.GetLength() < (idx + ran_cont_size + 1)) {
+  OctetBuffer::OctetBufferSizeType ran_cont_size = (4 * n) - 1;
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 1 + ran_cont_size + 1)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -352,7 +351,7 @@ std::unique_ptr<BaseRanContainerExtHdr> BaseRanContainerExtHdr::Decode(
                                 ran_container_type,
                                 pdu.GetOctets(),
                                 idx + 2,
-                                ran_cont_size + 1);
+                                ran_cont_size);
   // Increment index to point to Next Extension Header Type
   idx += ran_cont_size + 2;
 
@@ -427,7 +426,7 @@ bool PduSessionContainerExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<PduSessionContainerExtHdr> PduSessionContainerExtHdr::Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   // Check for atleast Extension Header Type + length byte
-  if (pdu.GetLength() < (idx + 2)) {
+  if (pdu.GetLength() < (idx + 1)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -441,9 +440,9 @@ std::unique_ptr<PduSessionContainerExtHdr> PduSessionContainerExtHdr::Decode(
   }
 
   uint8_t n = pdu.GetUint8(idx + 1);
-  OctetBuffer::OctetBufferSizeType pdu_sess_cont_size = 2 * ((4 * n) - 1);
-  // Check for PDU length
-  if (pdu.GetLength() < (idx + pdu_sess_cont_size + 1)) {
+  OctetBuffer::OctetBufferSizeType pdu_sess_cont_size = (4 * n) - 1;
+  // Length check considers Ext. header type + length + payload + next Ext. header type
+  if (pdu.GetLength() < (idx + 1 + pdu_sess_cont_size + 1)) {
     // TODO: Replace with proper logging when available
     std::cout << "Error PDU length is too short." << std::endl;
     return nullptr;
@@ -451,7 +450,7 @@ std::unique_ptr<PduSessionContainerExtHdr> PduSessionContainerExtHdr::Decode(
   auto res = std::make_unique<PduSessionContainerExtHdr>(
                                 pdu.GetOctets(),
                                 idx + 2,
-                                pdu_sess_cont_size + 1);
+                                pdu_sess_cont_size);
   // Increment index to point to Next Extension Header Type
   idx += pdu_sess_cont_size + 2;
 
@@ -473,7 +472,7 @@ RecoveryIe::~RecoveryIe() {}
 
 bool RecoveryIe::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(ie_type_);
-  buf.AppendBigEndianUint16(restart_cntr_);
+  buf.AppendUint8(restart_cntr_);
   return true;
 }
 
@@ -495,6 +494,40 @@ std::unique_ptr<RecoveryIe> RecoveryIe::Decode(const OctetBuffer &pdu,
   auto res = std::make_unique<RecoveryIe>(pdu.GetUint8(idx + 1));
   // Increment index to point to Next Ie
   idx += 2;
+
+  return res;
+}
+
+TunnelEndpointIdentifierData1Ie::TunnelEndpointIdentifierData1Ie(uint32_t teid)
+  : Ie(IeType::tunnelEndpointIdentifierData1, false), teid_(teid) {}
+
+TunnelEndpointIdentifierData1Ie::~TunnelEndpointIdentifierData1Ie() {}
+
+bool TunnelEndpointIdentifierData1Ie::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(ie_type_);
+  buf.AppendBigEndianUint32(teid_);
+  return true;
+}
+
+std::unique_ptr<TunnelEndpointIdentifierData1Ie> TunnelEndpointIdentifierData1Ie::Decode(
+    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
+
+  if (pdu.GetLength() < (idx + 3)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+  // Check for Ie type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(IeType::tunnelEndpointIdentifierData1)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Ie Type." << std::endl;
+    return nullptr;
+  }
+
+  auto res = std::make_unique<TunnelEndpointIdentifierData1Ie>(
+    pdu.GetBigEndianUint32(idx + 1));
+  // Increment index to point to Next Ie
+  idx += 4;
 
   return res;
 }

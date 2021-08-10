@@ -15,10 +15,10 @@ bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct) {
 
 bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct,
     OctetBuffer::OctetBufferSizeType idx, OctetBuffer::OctetBufferSizeType size) {
-  if ((oct.cbegin() + idx + size) > oct.cend()) {
+  if ((oct.cbegin() + idx + size) >= oct.cend()) {
     return false;  
   }
-  octet_.insert(octet_.end(), oct.cbegin() + idx, oct.cbegin() + idx + size);
+  octet_.insert(octet_.end(), oct.cbegin() + idx, oct.cbegin() + idx + size + 1);
   return true;
 }
 

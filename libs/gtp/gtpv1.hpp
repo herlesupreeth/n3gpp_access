@@ -249,4 +249,17 @@ class RecoveryIe : Ie {
   uint8_t restart_cntr_;
 };
 
+class TunnelEndpointIdentifierData1Ie : Ie {
+ public:
+  TunnelEndpointIdentifierData1Ie(uint32_t teid);
+  ~TunnelEndpointIdentifierData1Ie();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<TunnelEndpointIdentifierData1Ie> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ private:
+  uint32_t teid_;
+};
+
 } // namespace gtpv1u
