@@ -232,9 +232,21 @@ class Ie {
   Ie(IeType ie_type, bool is_tlv);
   ~Ie();
 
- private:
+ protected:
   uint8_t ie_type_;
 };
 
+class RecoveryIe : Ie {
+ public:
+  RecoveryIe(uint8_t restart_cntr);
+  ~RecoveryIe();
+
+  bool Encode(OctetBuffer &buf) const;
+  static std::unique_ptr<RecoveryIe> Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx);
+
+ private:
+  uint8_t restart_cntr_;
+};
 
 } // namespace gtpv1u

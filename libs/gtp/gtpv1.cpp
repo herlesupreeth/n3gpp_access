@@ -466,4 +466,37 @@ Ie::Ie(IeType ie_type, bool is_tlv) {
 
 Ie::~Ie() {}
 
+RecoveryIe::RecoveryIe(uint8_t restart_cntr)
+  : Ie(IeType::recovery, false), restart_cntr_(restart_cntr) {}
+
+RecoveryIe::~RecoveryIe() {}
+
+bool RecoveryIe::Encode(OctetBuffer &buf) const {
+  buf.AppendUint8(ie_type_);
+  buf.AppendBigEndianUint16(restart_cntr_);
+  return true;
+}
+
+std::unique_ptr<RecoveryIe> RecoveryIe::Decode(const OctetBuffer &pdu,
+    OctetBuffer::OctetBufferSizeType &idx) {
+
+  if (pdu.GetLength() < (idx + 1)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Error PDU length is too short." << std::endl;
+    return nullptr;
+  }
+  // Check for Ie type
+  if (pdu.GetUint8(idx) != static_cast<uint8_t>(IeType::recovery)) {
+    // TODO: Replace with proper logging when available
+    std::cout << "Unsupported Ie Type." << std::endl;
+    return nullptr;
+  }
+
+  auto res = std::make_unique<RecoveryIe>(pdu.GetUint8(idx + 1));
+  // Increment index to point to Next Ie
+  idx += 2;
+
+  return res;
+}
+
 } // namespace gtpv1u
