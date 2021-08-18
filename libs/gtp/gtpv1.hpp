@@ -19,6 +19,8 @@
 
 namespace gtpv1u {
 
+using common::OctetBuffer;
+
 enum class MessageType {
   echoRequest = 1,
   echoResponse = 2,

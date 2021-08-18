@@ -19,7 +19,7 @@ Header::Header(MessageType message_type, uint32_t teid, uint8_t flags,
 Header::~Header() {}
 
 uint16_t Header::GetLength() const {
- return length_;
+  return length_;
 }
 
 void Header::SetLength(uint16_t length) {
