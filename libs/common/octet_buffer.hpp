@@ -22,15 +22,15 @@ class OctetBuffer {
   OctetBuffer(Octets &oct) : octet_(oct) {}
   ~OctetBuffer() {}
 
-  bool CopyOctects(const Octets &oct);
-  bool CopyOctects(const Octets &oct, OctetBufferSizeType idx, OctetBufferSizeType size);
-  bool AppendUint8(uint8_t data);
-  bool AppendBigEndianUint16(uint16_t data);
-  bool AppendBigEndianUint24(uint32_t data);
-  bool AppendBigEndianUint32(uint32_t data);
-  bool AppendLittleEndianUint16(uint16_t data);
-  bool AppendLittleEndianUint24(uint32_t data);
-  bool AppendLittleEndianUint32(uint32_t data);
+  int CopyOctects(const Octets &oct);
+  int CopyOctects(const Octets &oct, OctetBufferSizeType idx, OctetBufferSizeType size);
+  int AppendUint8(uint8_t data);
+  int AppendBigEndianUint16(uint16_t data);
+  int AppendBigEndianUint24(uint32_t data);
+  int AppendBigEndianUint32(uint32_t data);
+  int AppendLittleEndianUint16(uint16_t data);
+  int AppendLittleEndianUint24(uint32_t data);
+  int AppendLittleEndianUint32(uint32_t data);
 
   const Octets& GetOctets() const;
   uint8_t GetUint8(OctetBufferSizeType idx) const;

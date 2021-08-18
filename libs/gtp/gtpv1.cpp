@@ -43,7 +43,7 @@ void Header::SetMessageType(MessageType message_type) {
 }
 
 bool Header::IsSequenceNumberPresent() const {
-  return (flags_ >> 1) & 0x01;
+  return ((flags_ >> 1) & 0x01) == 0x01;
 }
 
 void Header::SetSequenceNumberFlag() {
@@ -55,7 +55,7 @@ void Header::UnsetSequenceNumberFlag() {
 }
 
 bool Header::IsNPduNumberPresent() const {
-  return flags_ & 0x01;
+  return (flags_ & 0x01) == 0x01;
 }
 
 void Header::SetNPduNumberFlag() {
@@ -67,7 +67,7 @@ void Header::UnsetNPduNumberFlag() {
 }
 
 bool Header::IsNxtExtHeaderPresent() const {
-  return (flags_ >> 2) & 0x01;
+  return ((flags_ >> 2) & 0x01) == 0x01;
 }
 
 void Header::SetNxtExtHeaderFlag() {
@@ -78,12 +78,12 @@ void Header::UnsetNxtExtHeaderFlag() {
   flags_ &= 0xFB;
 }
 
-bool Header::Encode(OctetBuffer &buf) const {
+int Header::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(flags_);
   buf.AppendUint8(message_type_);
   buf.AppendBigEndianUint16(length_);
   buf.AppendBigEndianUint32(teid_);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
@@ -128,12 +128,12 @@ UdpPortExtHdr::UdpPortExtHdr(uint16_t port)
 
 UdpPortExtHdr::~UdpPortExtHdr() {}
 
-bool UdpPortExtHdr::Encode(OctetBuffer &buf) const {
+int UdpPortExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8(0x01);
   buf.AppendBigEndianUint16(port_);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<UdpPortExtHdr> UdpPortExtHdr::Decode(const OctetBuffer &pdu,
@@ -170,12 +170,12 @@ PdcpPduNumberExtHdr::PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num)
 
 PdcpPduNumberExtHdr::~PdcpPduNumberExtHdr() {}
 
-bool PdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
+int PdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8(0x01);
   buf.AppendBigEndianUint16(pdcp_pdu_num_);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<PdcpPduNumberExtHdr> PdcpPduNumberExtHdr::Decode(
@@ -218,14 +218,14 @@ LongPdcpPduNumberExtHdr::LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num)
 
 LongPdcpPduNumberExtHdr::~LongPdcpPduNumberExtHdr() {}
 
-bool LongPdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
+int LongPdcpPduNumberExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8(0x02);
   buf.AppendBigEndianUint24(l_pdcp_pdu_num_);
   // 3 Bytes Spare
   buf.AppendBigEndianUint24(0x00);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<LongPdcpPduNumberExtHdr> LongPdcpPduNumberExtHdr::Decode(
@@ -265,14 +265,14 @@ ServiceClassIndicatorExtHdr::ServiceClassIndicatorExtHdr(uint8_t sci)
 
 ServiceClassIndicatorExtHdr::~ServiceClassIndicatorExtHdr() {}
 
-bool ServiceClassIndicatorExtHdr::Encode(OctetBuffer &buf) const {
+int ServiceClassIndicatorExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8(0x01);
   buf.AppendUint8(sci_);
   // Spare
   buf.AppendUint8(0x00);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<ServiceClassIndicatorExtHdr> ServiceClassIndicatorExtHdr::Decode(
@@ -314,12 +314,12 @@ BaseRanContainerExtHdr::BaseRanContainerExtHdr(
 
 BaseRanContainerExtHdr::~BaseRanContainerExtHdr() {}
 
-bool BaseRanContainerExtHdr::Encode(OctetBuffer &buf) const {
+int BaseRanContainerExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8((3 - ran_container_.GetLength()) / 4);
   buf.CopyOctects(ran_container_.GetOctets());
-  return true;
+  return 0;
 }
 
 std::unique_ptr<BaseRanContainerExtHdr> BaseRanContainerExtHdr::Decode(
@@ -415,12 +415,12 @@ PduSessionContainerExtHdr::PduSessionContainerExtHdr(
 
 PduSessionContainerExtHdr::~PduSessionContainerExtHdr() {}
 
-bool PduSessionContainerExtHdr::Encode(OctetBuffer &buf) const {
+int PduSessionContainerExtHdr::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(nxt_ext_hdr_type_);
   // Length in 4 octets
   buf.AppendUint8((3 - pdu_sess_container_.GetLength()) / 4);
   buf.CopyOctects(pdu_sess_container_.GetOctets());
-  return true;
+  return 0;
 }
 
 std::unique_ptr<PduSessionContainerExtHdr> PduSessionContainerExtHdr::Decode(
@@ -470,10 +470,10 @@ RecoveryIe::RecoveryIe(uint8_t restart_cntr)
 
 RecoveryIe::~RecoveryIe() {}
 
-bool RecoveryIe::Encode(OctetBuffer &buf) const {
+int RecoveryIe::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(ie_type_);
   buf.AppendUint8(restart_cntr_);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<RecoveryIe> RecoveryIe::Decode(const OctetBuffer &pdu,
@@ -503,10 +503,10 @@ TunnelEndpointIdentifierData1Ie::TunnelEndpointIdentifierData1Ie(uint32_t teid)
 
 TunnelEndpointIdentifierData1Ie::~TunnelEndpointIdentifierData1Ie() {}
 
-bool TunnelEndpointIdentifierData1Ie::Encode(OctetBuffer &buf) const {
+int TunnelEndpointIdentifierData1Ie::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(ie_type_);
   buf.AppendBigEndianUint32(teid_);
-  return true;
+  return 0;
 }
 
 std::unique_ptr<TunnelEndpointIdentifierData1Ie> TunnelEndpointIdentifierData1Ie::Decode(

@@ -49,7 +49,7 @@ class Header {
   void SetNxtExtHeaderFlag();
   void UnsetNxtExtHeaderFlag();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<Header> Decode(
     const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
 
@@ -91,7 +91,7 @@ class UdpPortExtHdr : ExtHdr {
   UdpPortExtHdr(uint16_t port);
   ~UdpPortExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<UdpPortExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -104,7 +104,7 @@ class PdcpPduNumberExtHdr : ExtHdr {
   PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num);
   ~PdcpPduNumberExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<PdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -118,7 +118,7 @@ class LongPdcpPduNumberExtHdr : ExtHdr {
   LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num);
   ~LongPdcpPduNumberExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<LongPdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -132,7 +132,7 @@ class ServiceClassIndicatorExtHdr : ExtHdr {
   ServiceClassIndicatorExtHdr(uint8_t sci);
   ~ServiceClassIndicatorExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<ServiceClassIndicatorExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -147,7 +147,7 @@ class BaseRanContainerExtHdr : ExtHdr {
     OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
   ~BaseRanContainerExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<BaseRanContainerExtHdr> Decode(
     ExtHdrType ran_container_type, const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
@@ -195,7 +195,7 @@ class PduSessionContainerExtHdr : ExtHdr {
     OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
   ~PduSessionContainerExtHdr();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<PduSessionContainerExtHdr> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -241,7 +241,7 @@ class RecoveryIe : Ie {
   RecoveryIe(uint8_t restart_cntr);
   ~RecoveryIe();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<RecoveryIe> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 
@@ -254,7 +254,7 @@ class TunnelEndpointIdentifierData1Ie : Ie {
   TunnelEndpointIdentifierData1Ie(uint32_t teid);
   ~TunnelEndpointIdentifierData1Ie();
 
-  bool Encode(OctetBuffer &buf) const;
+  int Encode(OctetBuffer &buf) const;
   static std::unique_ptr<TunnelEndpointIdentifierData1Ie> Decode(const OctetBuffer &pdu,
     OctetBuffer::OctetBufferSizeType &idx);
 

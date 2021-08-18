@@ -8,67 +8,67 @@
 
 #include "octet_buffer.hpp"
 
-bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct) {
+int OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct) {
   octet_.insert(octet_.end(), oct.cbegin(), oct.cend());
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct,
+int OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct,
     OctetBuffer::OctetBufferSizeType idx, OctetBuffer::OctetBufferSizeType size) {
   if ((oct.cbegin() + idx + size) >= oct.cend()) {
-    return false;  
+    return -1;
   }
   octet_.insert(octet_.end(), oct.cbegin() + idx, oct.cbegin() + idx + size + 1);
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendUint8(uint8_t data) {
+int OctetBuffer::AppendUint8(uint8_t data) {
   octet_.push_back(data & 0xFF);
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendBigEndianUint16(uint16_t data) {
+int OctetBuffer::AppendBigEndianUint16(uint16_t data) {
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendBigEndianUint24(uint32_t data) {
+int OctetBuffer::AppendBigEndianUint24(uint32_t data) {
   uint32_t data_24_bit = data & 0x00FFFFFF;
   AppendUint8(static_cast<uint8_t>(data >> 16 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendBigEndianUint32(uint32_t data) {
+int OctetBuffer::AppendBigEndianUint32(uint32_t data) {
   AppendUint8(static_cast<uint8_t>(data >> 24 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 16 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendLittleEndianUint16(uint16_t data) {
+int OctetBuffer::AppendLittleEndianUint16(uint16_t data) {
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendLittleEndianUint24(uint32_t data) {
+int OctetBuffer::AppendLittleEndianUint24(uint32_t data) {
   uint32_t data_24_bit = data & 0x00FFFFFF;
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 16 & 0xFF));
-  return true;
+  return 0;
 }
 
-bool OctetBuffer::AppendLittleEndianUint32(uint32_t data) {
+int OctetBuffer::AppendLittleEndianUint32(uint32_t data) {
   AppendUint8(static_cast<uint8_t>(data & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 8 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 16 & 0xFF));
   AppendUint8(static_cast<uint8_t>(data >> 24 & 0xFF));
-  return true;
+  return 0;
 }
 
 const OctetBuffer::Octets& OctetBuffer::GetOctets() const {
