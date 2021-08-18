@@ -13,6 +13,8 @@
 #include <cstdint>
 #include <memory>
 
+namespace common {
+
 class OctetBuffer {
  public:
   typedef std::vector<uint8_t> Octets;
@@ -47,3 +49,5 @@ class OctetBuffer {
  private:
   Octets octet_;
 };
+
+} // namespace common

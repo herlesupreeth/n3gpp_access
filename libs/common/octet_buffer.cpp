@@ -8,6 +8,8 @@
 
 #include "octet_buffer.hpp"
 
+namespace common {
+
 int OctetBuffer::CopyOctects(const OctetBuffer::Octets &oct) {
   octet_.insert(octet_.end(), oct.cbegin(), oct.cend());
   return 0;
@@ -122,3 +124,5 @@ OctetBuffer::OctetBufferSizeType OctetBuffer::GetLength() const {
 bool OctetBuffer::IsEmpty() const {
   return octet_.empty();
 }
+
+} // namespace common
