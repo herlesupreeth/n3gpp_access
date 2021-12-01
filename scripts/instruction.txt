@@ -1,0 +1,46 @@
+Instructions for generating C code from 3GPP specifications
+
+1. Download the required specification via ftp
+
+e.g. 
+
+For NGAP - https://www.3gpp.org/ftp/Specs/archive/38_series/38.413/
+For NR-RRC - https://www.3gpp.org/ftp/Specs/archive/38_series/38.331/
+
+2. Extract the zip file to get specification in docx format
+
+3. Use the below command to convert .docx to .txt format
+
+soffice --headless --cat <spec.docx> >> <spec.txt>
+
+e.g.
+
+soffice --headless --cat 38413-g40.docx >> 38413-g40.txt
+soffice --headless --cat 38331-g40.docx >> 38331-g40.txt
+
+4. Compile the soffice_txt_to_asn.cpp program as follows:
+
+g++ -o soffice_txt_to_asn soffice_txt_to_asn.cpp
+
+5. Use the above compiled program to extract the ASN definitions as in following example
+
+e.g.
+
+./soffice_txt_to_asn 38413-g40.txt
+
+This will generate a file with name 38413-g40.asn1
+
+6. Use the above extracted ASN definitions as follows in generate_from_asn1 script
+
+IMPORTANT!! Make sure to install asn1c compile from the following repository and branch
+-- https://github.com/brchiu/asn1c/tree/velichkov_s1ap_plus_option_group
+
+./generate_from_asn1.sh -o <output_dir> -i <input_dir> -p <prefix>
+
+e.g.
+
+For NGAP:
+
+./generate_from_asn1.sh -o "./ngap/" -i "./ngap_asn/" -p Ngap_
+
+where, 38413-g40.asn1 is contained inside ngap_asn folder
