@@ -6,8 +6,9 @@
 # The software and all associated files are licensed under GPL-3.0
 # and subject to the terms and conditions defined in LICENSE file.
 
-# Install ASN1 Compile from following link https://github.com/mouse07410/asn1c
-# Example: ./generate_from_asn1.sh -o "./ngap/" -i "./asn1/" -p Ngap
+# Install ASN1 Compile from following link https://github.com/brchiu/asn1c/tree/velichkov_s1ap_plus_option_group
+# Tested for Ngap spec - 38.413-g40 and NR-RRC spec - 38.331-g40
+# Example: ./generate_from_asn1.sh -o "./ngap/" -i "./asn1/" -p Ngap_
 
 set -e
 
