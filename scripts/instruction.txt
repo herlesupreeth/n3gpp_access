@@ -20,7 +20,7 @@ soffice --headless --cat 38331-g40.docx >> 38331-g40.txt
 
 4. Compile the soffice_txt_to_asn.cpp program as follows:
 
-g++ -o soffice_txt_to_asn soffice_txt_to_asn.cpp
+g++ -o soffice_txt_to_asn soffice_txt_to_asn.cc
 
 5. Use the above compiled program to extract the ASN definitions as in following example
 
