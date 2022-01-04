@@ -3,8 +3,11 @@
  * All rights reserved.
  * Redistribution and modifications are permitted subject to BSD license.
  */
+#ifndef ASN_DISABLE_OER_SUPPORT
+
 #include <asn_internal.h>
 #include <constr_CHOICE.h>
+#include <errno.h>
 
 /*
  * Return a standardized complex structure.
@@ -106,7 +109,7 @@ oer_fetch_tag(const void *ptr, size_t size, ber_tlv_tag_t *tag_r) {
              */
             if(val >> ((8 * sizeof(val)) - 9)) {
                 /*
-                 * We would not be able to accommodate
+                 * We would not be able to accomodate
                  * any more tag bits.
                  */
                 return -1;
@@ -213,7 +216,7 @@ CHOICE_decode_oer(const asn_codec_ctx_t *opt_codec_ctx,
         asn_TYPE_member_t *elm = &elements[ctx->step]; /* CHOICE's element */
         void *memb_ptr;         /* Pointer to the member */
         void **memb_ptr2;       /* Pointer to that pointer */
-        asn_dec_rval_t rval = {0,0};
+        asn_dec_rval_t rval;
 
         /*
          * Compute the position of the member inside a structure,
@@ -373,3 +376,5 @@ CHOICE_encode_oer(const asn_TYPE_descriptor_t *td,
 
     return er;
 }
+
+#endif  /* ASN_DISABLE_OER_SUPPORT */

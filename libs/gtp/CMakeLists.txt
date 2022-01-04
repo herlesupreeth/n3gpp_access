@@ -14,7 +14,3 @@ add_library(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC common_lib)
-
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif ()

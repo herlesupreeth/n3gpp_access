@@ -45,7 +45,7 @@ extern asn_TYPE_descriptor_t *asn_pdu_collection[];
 #endif
 
 /*
- * Open file and parse its contents.
+ * Open file and parse its contens.
  */
 static void *data_decode_from_file(enum asn_transfer_syntax,
                                    asn_TYPE_descriptor_t *asnTypeOfPDU,
@@ -126,9 +126,6 @@ ats_simple_name(enum asn_transfer_syntax syntax) {
     case ATS_UNALIGNED_BASIC_PER:
     case ATS_UNALIGNED_CANONICAL_PER:
         return "PER";
-    case ATS_ALIGNED_BASIC_PER:
-    case ATS_ALIGNED_CANONICAL_PER:
-        return "APER";        
     default:
         return "<?>";
     }
@@ -149,8 +146,6 @@ static syntax_selector input_encodings[] = {
      "Input is in OER (Octet Encoding Rules)"},
     {"per", ATS_UNALIGNED_BASIC_PER, CODEC_OFFSET(uper_decoder),
      "Input is in Unaligned PER (Packed Encoding Rules)"},
-    {"uper", ATS_UNALIGNED_BASIC_PER, CODEC_OFFSET(uper_decoder),
-     "Input is in Unaligned PER (Packed Encoding Rules)"},
     {"aper", ATS_ALIGNED_BASIC_PER, CODEC_OFFSET(aper_decoder),
      "Input is in Aligned PER (Packed Encoding Rules)"},
     {"xer", ATS_BASIC_XER, CODEC_OFFSET(xer_decoder),
@@ -163,8 +158,6 @@ static syntax_selector output_encodings[] = {
     {"oer", ATS_CANONICAL_OER, CODEC_OFFSET(oer_encoder),
      "Output as Canonical OER (Octet Encoding Rules)"},
     {"per", ATS_UNALIGNED_CANONICAL_PER, CODEC_OFFSET(uper_encoder),
-     "Output as Unaligned PER (Packed Encoding Rules)"},
-    {"uper", ATS_UNALIGNED_CANONICAL_PER, CODEC_OFFSET(uper_encoder),
      "Output as Unaligned PER (Packed Encoding Rules)"},
     {"aper", ATS_ALIGNED_CANONICAL_PER, CODEC_OFFSET(aper_encoder),
      "Output as Aligned PER (Packed Encoding Rules)"},
@@ -228,15 +221,15 @@ main(int ac, char *av[]) {
     }
 
     /* Figure out if a specialty decoder needs to be default */
-#if !defined(ASN_DISABLE_OER_SUPPORT)
+#ifndef ASN_DISABLE_OER_SUPPORT
     isyntax = ATS_BASIC_OER;
-#endif  /* !defined(ASN_DISABLE_OER_SUPPORT) */
-#if !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT)
+#endif
+#ifndef ASN_DISABLE_PER_SUPPORT
     isyntax = ATS_UNALIGNED_BASIC_PER;
-#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) || !defined(ASN_DISABLE_APER_SUPPORT) */
+#endif
 
     /*
-     * Process the command-line arguments.
+     * Pocess the command-line argments.
      */
     while((ch = getopt(ac, av, "i:o:1b:cdn:p:hs:" JUNKOPT RANDOPT)) != -1)
     switch(ch) {
@@ -449,7 +442,7 @@ main(int ac, char *av[]) {
        * Process all files in turn.
        */
       for(ac_i = (isyntax == ATS_RANDOM) ? -1 : 0; ac_i < ac; ac_i++) {
-        asn_enc_rval_t erv = {0,0,0};
+        asn_enc_rval_t erv;
         void *structure;    /* Decoded structure */
         FILE *file;
         char *name;
@@ -597,7 +590,7 @@ buffer_dump() {
 
 /*
  * Move the buffer content left N bits, possibly joining it with
- * preceding content.
+ * preceeding content.
  */
 static void
 buffer_shift_left(size_t offset, int bits) {
@@ -850,31 +843,20 @@ data_decode_from_file(enum asn_transfer_syntax isyntax, asn_TYPE_descriptor_t *p
 #endif
 
         if(is_syntax_PER(isyntax) && opt_nopad) {
-            switch(isyntax) {
-#if !defined(ASN_DISABLE_UPER_SUPPORT)
-            case ATS_UNALIGNED_BASIC_PER:
-            case ATS_UNALIGNED_CANONICAL_PER:
+#ifdef  ASN_DISABLE_PER_SUPPORT
+            rval.code = RC_FAIL;
+            rval.consumed = 0;
+#else
+            if(isyntax == ATS_UNALIGNED_BASIC_PER)
                 rval = uper_decode(opt_codec_ctx, pduType, (void **)&structure,
                                    i_bptr, i_size, 0, DynamicBuffer.unbits);
-                /* uper_decode() returns bits! */
-                ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
-                rval.consumed >>= 3;    /* Convert bits into bytes. */
-                break;
-#endif  /* !defined(ASN_DISABLE_UPER_SUPPORT) */
-#if !defined(ASN_DISABLE_APER_SUPPORT)
-            case ATS_ALIGNED_BASIC_PER:
-            case ATS_ALIGNED_CANONICAL_PER:
+            else
                 rval = aper_decode(opt_codec_ctx, pduType, (void **)&structure,
                                    i_bptr, i_size, 0, DynamicBuffer.unbits);
-                /* aper_decode() returns bits! */
-                ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
-                rval.consumed >>= 3;    /* Convert bits into bytes. */
-                break;
-#endif  /* !defined(ASN_DISABLE_APER_SUPPORT) */
-            default:
-                rval.code = RC_FAIL;
-                rval.consumed = 0;
-            }
+            /* uper_decode() returns bits! */
+            ecbits = rval.consumed % 8; /* Bits consumed from the last byte */
+            rval.consumed >>= 3;    /* Convert bits into bytes. */
+#endif
             /* Non-padded PER decoder */
         } else {
             rval = asn_decode(opt_codec_ctx, isyntax, pduType,
