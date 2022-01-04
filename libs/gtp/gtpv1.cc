@@ -381,8 +381,8 @@ std::unique_ptr<RanContainerExtHdr> RanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<RanContainerExtHdr>(
 	  static_cast<RanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
-											ExtHdrType::ranContainer, pdu, idx)
-											.release()));
+		  ExtHdrType::ranContainer, pdu, idx)
+		  .release()));
   return res;
 }
 
@@ -399,8 +399,8 @@ std::unique_ptr<XwRanContainerExtHdr> XwRanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<XwRanContainerExtHdr>(
 	  static_cast<XwRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
-											  ExtHdrType::xwRanContainer, pdu, idx)
-											  .release()));
+		  ExtHdrType::xwRanContainer, pdu, idx)
+		  .release()));
   return res;
 }
 
@@ -417,8 +417,8 @@ std::unique_ptr<NrRanContainerExtHdr> NrRanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<NrRanContainerExtHdr>(
 	  static_cast<NrRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
-											  ExtHdrType::nrRanContainer, pdu, idx)
-											  .release()));
+		  ExtHdrType::nrRanContainer, pdu, idx)
+		  .release()));
   return res;
 }
 

@@ -24,11 +24,10 @@ class OctetBuffer {
   OctetBuffer()
 	  : octet_() {
   }
-  OctetBuffer(Octets &oct)
+  explicit OctetBuffer(Octets &oct)
 	  : octet_(oct) {
   }
-  ~OctetBuffer() {
-  }
+  ~OctetBuffer() = default;
 
   int CopyOctets(const Octets &oct);
   int CopyOctets(const Octets &oct, OctetBufferSizeType idx, OctetBufferSizeType size);
@@ -40,17 +39,17 @@ class OctetBuffer {
   int AppendLittleEndianUint24(uint32_t data);
   int AppendLittleEndianUint32(uint32_t data);
 
-  const Octets &GetOctets() const;
-  uint8_t GetUint8(OctetBufferSizeType idx) const;
-  uint16_t GetBigEndianUint16(OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint24(OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint32(OctetBufferSizeType idx) const;
-  uint16_t GetLittleEndianUint16(OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint24(OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint32(OctetBufferSizeType idx) const;
+  [[nodiscard]] const Octets &GetOctets() const;
+  [[nodiscard]] uint8_t GetUint8(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint16_t GetBigEndianUint16(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint32_t GetBigEndianUint24(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint32_t GetBigEndianUint32(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint16_t GetLittleEndianUint16(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint32_t GetLittleEndianUint24(OctetBufferSizeType idx) const;
+  [[nodiscard]] uint32_t GetLittleEndianUint32(OctetBufferSizeType idx) const;
 
-  OctetBufferSizeType GetLength() const;
-  bool IsEmpty() const;
+  [[nodiscard]] OctetBufferSizeType GetLength() const;
+  [[nodiscard]] bool IsEmpty() const;
 
  private:
   Octets octet_;

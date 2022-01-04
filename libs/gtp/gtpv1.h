@@ -113,7 +113,7 @@ class PdcpPduNumberExtHdr : ExtHdr {
 
  private:
   // 15 bits
-  uint16_t pdcp_pdu_num_ : 15;
+  uint16_t pdcp_pdu_num_: 15;
 };
 
 class LongPdcpPduNumberExtHdr : ExtHdr {
@@ -127,7 +127,7 @@ class LongPdcpPduNumberExtHdr : ExtHdr {
 
  private:
   // 18 bits
-  uint32_t l_pdcp_pdu_num_ : 18;
+  uint32_t l_pdcp_pdu_num_: 18;
 };
 
 class ServiceClassIndicatorExtHdr : ExtHdr {
