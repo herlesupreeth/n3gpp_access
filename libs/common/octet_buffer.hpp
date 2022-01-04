@@ -8,46 +8,56 @@
 
 #pragma once
 
-#include <vector>
-#include <iterator>
 #include <cstdint>
+#include <iterator>
 #include <memory>
+#include <vector>
 
-namespace common {
+namespace common
+{
 
-class OctetBuffer {
- public:
-  typedef std::vector<uint8_t> Octets;
-  typedef Octets::size_type OctetBufferSizeType;
+	class OctetBuffer
+	{
+	 public:
+		typedef std::vector<uint8_t> Octets;
+		typedef Octets::size_type OctetBufferSizeType;
 
-  OctetBuffer() : octet_() {}
-  OctetBuffer(Octets &oct) : octet_(oct) {}
-  ~OctetBuffer() {}
+		OctetBuffer()
+			: octet_()
+		{
+		}
+		OctetBuffer(Octets& oct)
+			: octet_(oct)
+		{
+		}
+		~OctetBuffer()
+		{
+		}
 
-  int CopyOctects(const Octets &oct);
-  int CopyOctects(const Octets &oct, OctetBufferSizeType idx, OctetBufferSizeType size);
-  int AppendUint8(uint8_t data);
-  int AppendBigEndianUint16(uint16_t data);
-  int AppendBigEndianUint24(uint32_t data);
-  int AppendBigEndianUint32(uint32_t data);
-  int AppendLittleEndianUint16(uint16_t data);
-  int AppendLittleEndianUint24(uint32_t data);
-  int AppendLittleEndianUint32(uint32_t data);
+		int CopyOctets(const Octets& oct);
+		int CopyOctets(const Octets& oct, OctetBufferSizeType idx, OctetBufferSizeType size);
+		int AppendUint8(uint8_t data);
+		int AppendBigEndianUint16(uint16_t data);
+		int AppendBigEndianUint24(uint32_t data);
+		int AppendBigEndianUint32(uint32_t data);
+		int AppendLittleEndianUint16(uint16_t data);
+		int AppendLittleEndianUint24(uint32_t data);
+		int AppendLittleEndianUint32(uint32_t data);
 
-  const Octets& GetOctets() const;
-  uint8_t GetUint8(OctetBufferSizeType idx) const;
-  uint16_t GetBigEndianUint16(OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint24(OctetBufferSizeType idx) const;
-  uint32_t GetBigEndianUint32(OctetBufferSizeType idx) const;
-  uint16_t GetLittleEndianUint16(OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint24(OctetBufferSizeType idx) const;
-  uint32_t GetLittleEndianUint32(OctetBufferSizeType idx) const;
+		const Octets& GetOctets() const;
+		uint8_t GetUint8(OctetBufferSizeType idx) const;
+		uint16_t GetBigEndianUint16(OctetBufferSizeType idx) const;
+		uint32_t GetBigEndianUint24(OctetBufferSizeType idx) const;
+		uint32_t GetBigEndianUint32(OctetBufferSizeType idx) const;
+		uint16_t GetLittleEndianUint16(OctetBufferSizeType idx) const;
+		uint32_t GetLittleEndianUint24(OctetBufferSizeType idx) const;
+		uint32_t GetLittleEndianUint32(OctetBufferSizeType idx) const;
 
-  OctetBufferSizeType GetLength() const;
-  bool IsEmpty() const;
+		OctetBufferSizeType GetLength() const;
+		bool IsEmpty() const;
 
- private:
-  Octets octet_;
-};
+	 private:
+		Octets octet_;
+	};
 
-} // namespace common
+}// namespace common

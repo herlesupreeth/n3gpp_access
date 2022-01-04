@@ -1,8 +1,8 @@
 ########################################################################
-# Create ngap_lib
+# Create asn1_ngap_lib
 ########################################################################
 cmake_minimum_required(VERSION 3.16)
-project(ngap_lib)
+project(asn1_ngap_lib)
 
 file(GLOB NGAP_ASN1_HDRS *.h)
 file(GLOB NGAP_ASN1_SRCS *.c)

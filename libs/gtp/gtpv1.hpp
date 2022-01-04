@@ -8,260 +8,280 @@
 
 #pragma once
 
-#include <optional>
 #include <cstdint>
 #include <iostream>
-#include <vector>
 #include <iterator>
 #include <memory>
+#include <optional>
+#include <vector>
 
 #include "octet_buffer.hpp"
 
-namespace gtpv1u {
+namespace gtpv1u
+{
 
-using common::OctetBuffer;
+	using common::OctetBuffer;
 
-enum class MessageType {
-  echoRequest = 1,
-  echoResponse = 2,
-  errorIndication = 26,
-  supportedExtensionHeadersNotification = 31,
-  endMarker = 254,
-  gPdu = 255,
-};
+	enum class MessageType
+	{
+		echoRequest = 1,
+		echoResponse = 2,
+		errorIndication = 26,
+		supportedExtensionHeadersNotification = 31,
+		endMarker = 254,
+		gPdu = 255,
+	};
 
-class Header {
- public:
-  Header(MessageType message_type, uint32_t teid, uint8_t flags, uint16_t length);
-  ~Header();
+	class Header
+	{
+	 public:
+		Header(MessageType message_type, uint32_t teid, uint8_t flags, uint16_t length);
+		~Header();
 
-  uint16_t GetLength() const;
-  void SetLength(uint16_t length);
-  uint32_t GetTeid() const;
-  void SetTeid(uint32_t teid);
-  uint8_t GetMessageType() const;
-  void SetMessageType(MessageType message_type);
-  bool IsSequenceNumberPresent() const;
-  void SetSequenceNumberFlag();
-  void UnsetSequenceNumberFlag();
-  bool IsNPduNumberPresent() const;
-  void SetNPduNumberFlag();
-  void UnsetNPduNumberFlag();
-  bool IsNxtExtHeaderPresent() const;
-  void SetNxtExtHeaderFlag();
-  void UnsetNxtExtHeaderFlag();
+		uint16_t GetLength() const;
+		void SetLength(uint16_t length);
+		uint32_t GetTeid() const;
+		void SetTeid(uint32_t teid);
+		uint8_t GetMessageType() const;
+		void SetMessageType(MessageType message_type);
+		bool IsSequenceNumberPresent() const;
+		void SetSequenceNumberFlag();
+		void UnsetSequenceNumberFlag();
+		bool IsNPduNumberPresent() const;
+		void SetNPduNumberFlag();
+		void UnsetNPduNumberFlag();
+		bool IsNxtExtHeaderPresent() const;
+		void SetNxtExtHeaderFlag();
+		void UnsetNxtExtHeaderFlag();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<Header> Decode(
-    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<Header> Decode(
+			const OctetBuffer& pdu, OctetBuffer::OctetBufferSizeType& idx);
 
- private:
-  uint8_t flags_ = 0x30;
-  uint8_t message_type_;
-  uint16_t length_ = 0;
-  uint32_t teid_ = 0;
-};
+	 private:
+		uint8_t flags_ = 0x30;
+		uint8_t message_type_;
+		uint16_t length_ = 0;
+		uint32_t teid_ = 0;
+	};
 
-enum class ExtHdrType {
-  noMoreExtensionHeaders = 0x00,
-  reservedControlPlaneOnly1 = 0x01,
-  reservedControlPlaneOnly2 = 0x02,
-  longPdcpPduNumber1 = 0x03,
-  serviceClassIndicator = 0x20,
-  udpPort = 0x40,
-  ranContainer = 0x81,
-  longPdcpPduNumber2 = 0x82,
-  xwRanContainer = 0x83,
-  nrRanContainer = 0x84,
-  pduSessionContainer = 0x85,
-  pdcpPduNumber = 0xC0,
-  reservedControlPlaneOnly3 = 0xC1,
-  reservedControlPlaneOnly4 = 0xC2,
-};
+	enum class ExtHdrType
+	{
+		noMoreExtensionHeaders = 0x00,
+		reservedControlPlaneOnly1 = 0x01,
+		reservedControlPlaneOnly2 = 0x02,
+		longPdcpPduNumber1 = 0x03,
+		serviceClassIndicator = 0x20,
+		udpPort = 0x40,
+		ranContainer = 0x81,
+		longPdcpPduNumber2 = 0x82,
+		xwRanContainer = 0x83,
+		nrRanContainer = 0x84,
+		pduSessionContainer = 0x85,
+		pdcpPduNumber = 0xC0,
+		reservedControlPlaneOnly3 = 0xC1,
+		reservedControlPlaneOnly4 = 0xC2,
+	};
 
-class ExtHdr {
- public:
-  ExtHdr(ExtHdrType ext_type);
-  ~ExtHdr();
+	class ExtHdr
+	{
+	 public:
+		ExtHdr(ExtHdrType ext_type);
+		~ExtHdr();
 
- protected:
-  uint8_t nxt_ext_hdr_type_ = 0x00;
-};
+	 protected:
+		uint8_t nxt_ext_hdr_type_ = 0x00;
+	};
 
-class UdpPortExtHdr : ExtHdr {
- public:
-  UdpPortExtHdr(uint16_t port);
-  ~UdpPortExtHdr();
+	class UdpPortExtHdr : ExtHdr
+	{
+	 public:
+		UdpPortExtHdr(uint16_t port);
+		~UdpPortExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<UdpPortExtHdr> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<UdpPortExtHdr> Decode(const OctetBuffer& pdu,
+													 OctetBuffer::OctetBufferSizeType& idx);
 
- private:
-  uint16_t port_;
-};
+	 private:
+		uint16_t port_;
+	};
 
-class PdcpPduNumberExtHdr : ExtHdr {
- public:
-  PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num);
-  ~PdcpPduNumberExtHdr();
+	class PdcpPduNumberExtHdr : ExtHdr
+	{
+	 public:
+		PdcpPduNumberExtHdr(uint16_t pdcp_pdu_num);
+		~PdcpPduNumberExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<PdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<PdcpPduNumberExtHdr> Decode(const OctetBuffer& pdu,
+														   OctetBuffer::OctetBufferSizeType& idx);
 
- private:
-  // 15 bits
-  uint16_t pdcp_pdu_num_ : 15;
-};
+	 private:
+		// 15 bits
+		uint16_t pdcp_pdu_num_ : 15;
+	};
 
-class LongPdcpPduNumberExtHdr : ExtHdr {
- public:
-  LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num);
-  ~LongPdcpPduNumberExtHdr();
+	class LongPdcpPduNumberExtHdr : ExtHdr
+	{
+	 public:
+		LongPdcpPduNumberExtHdr(uint16_t l_pdcp_pdu_num);
+		~LongPdcpPduNumberExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<LongPdcpPduNumberExtHdr> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<LongPdcpPduNumberExtHdr> Decode(const OctetBuffer& pdu,
+															   OctetBuffer::OctetBufferSizeType& idx);
 
- private:
-  // 18 bits
-  uint32_t l_pdcp_pdu_num_ : 18;
-};
+	 private:
+		// 18 bits
+		uint32_t l_pdcp_pdu_num_ : 18;
+	};
 
-class ServiceClassIndicatorExtHdr : ExtHdr {
- public:
-  ServiceClassIndicatorExtHdr(uint8_t sci);
-  ~ServiceClassIndicatorExtHdr();
+	class ServiceClassIndicatorExtHdr : ExtHdr
+	{
+	 public:
+		ServiceClassIndicatorExtHdr(uint8_t sci);
+		~ServiceClassIndicatorExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<ServiceClassIndicatorExtHdr> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<ServiceClassIndicatorExtHdr> Decode(const OctetBuffer& pdu,
+																   OctetBuffer::OctetBufferSizeType& idx);
 
- private:
-  uint8_t sci_;
-};
+	 private:
+		uint8_t sci_;
+	};
 
-class BaseRanContainerExtHdr : ExtHdr {
- public:
-  BaseRanContainerExtHdr(
-    ExtHdrType ran_container_type, const OctetBuffer::Octets &ran_container,
-    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
-  ~BaseRanContainerExtHdr();
+	class BaseRanContainerExtHdr : ExtHdr
+	{
+	 public:
+		BaseRanContainerExtHdr(
+			ExtHdrType ran_container_type, const OctetBuffer::Octets& ran_container,
+			OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+		~BaseRanContainerExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<BaseRanContainerExtHdr> Decode(
-    ExtHdrType ran_container_type, const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<BaseRanContainerExtHdr> Decode(
+			ExtHdrType ran_container_type, const OctetBuffer& pdu,
+			OctetBuffer::OctetBufferSizeType& idx);
 
- protected:
-  OctetBuffer ran_container_;
-};
+	 protected:
+		OctetBuffer ran_container_;
+	};
 
-class RanContainerExtHdr : public BaseRanContainerExtHdr {
- public:
-  RanContainerExtHdr(
-    const OctetBuffer::Octets &ran_container,
-    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
-  ~RanContainerExtHdr();
+	class RanContainerExtHdr : public BaseRanContainerExtHdr
+	{
+	 public:
+		RanContainerExtHdr(
+			const OctetBuffer::Octets& ran_container,
+			OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+		~RanContainerExtHdr();
 
-  static std::unique_ptr<RanContainerExtHdr> Decode(
-    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
-};
+		static std::unique_ptr<RanContainerExtHdr> Decode(
+			const OctetBuffer& pdu, OctetBuffer::OctetBufferSizeType& idx);
+	};
 
-class XwRanContainerExtHdr : BaseRanContainerExtHdr {
- public:
-  XwRanContainerExtHdr(
-    const OctetBuffer::Octets &ran_container,
-    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
-  ~XwRanContainerExtHdr();
+	class XwRanContainerExtHdr : BaseRanContainerExtHdr
+	{
+	 public:
+		XwRanContainerExtHdr(
+			const OctetBuffer::Octets& ran_container,
+			OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+		~XwRanContainerExtHdr();
 
-  static std::unique_ptr<XwRanContainerExtHdr> Decode(
-    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
-};
+		static std::unique_ptr<XwRanContainerExtHdr> Decode(
+			const OctetBuffer& pdu, OctetBuffer::OctetBufferSizeType& idx);
+	};
 
-class NrRanContainerExtHdr : BaseRanContainerExtHdr {
- public:
-  NrRanContainerExtHdr(
-    const OctetBuffer::Octets &ran_container,
-    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
-  ~NrRanContainerExtHdr();
+	class NrRanContainerExtHdr : BaseRanContainerExtHdr
+	{
+	 public:
+		NrRanContainerExtHdr(
+			const OctetBuffer::Octets& ran_container,
+			OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+		~NrRanContainerExtHdr();
 
-  static std::unique_ptr<NrRanContainerExtHdr> Decode(
-    const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx);
-};
+		static std::unique_ptr<NrRanContainerExtHdr> Decode(
+			const OctetBuffer& pdu, OctetBuffer::OctetBufferSizeType& idx);
+	};
 
-class PduSessionContainerExtHdr : ExtHdr {
- public:
-  PduSessionContainerExtHdr(const OctetBuffer::Octets &pdu_sess_container,
-    OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
-  ~PduSessionContainerExtHdr();
+	class PduSessionContainerExtHdr : ExtHdr
+	{
+	 public:
+		PduSessionContainerExtHdr(const OctetBuffer::Octets& pdu_sess_container,
+								  OctetBuffer::OctetBufferSizeType start_idx, OctetBuffer::OctetBufferSizeType size);
+		~PduSessionContainerExtHdr();
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<PduSessionContainerExtHdr> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<PduSessionContainerExtHdr> Decode(const OctetBuffer& pdu,
+																 OctetBuffer::OctetBufferSizeType& idx);
 
- protected:
-  OctetBuffer pdu_sess_container_;
-};
+	 protected:
+		OctetBuffer pdu_sess_container_;
+	};
 
-class Msg {
- public:
-  uint16_t GetSequenceNumber();
-  void SetSequenceNumber(uint16_t seq_num);
-  uint8_t GetNPduNumber();
-  void SetNPduNumber(uint8_t n_pdu_num);
- private:
-  Header header_;
-  std::optional<uint16_t> seq_num_ = std::nullopt;
-  std::optional<uint8_t> n_pdu_num_ = std::nullopt;
-  std::optional<std::vector<ExtHdr>> extensions_ = std::nullopt;
-  OctetBuffer payload_;
-};
+	class Msg
+	{
+	 public:
+		uint16_t GetSequenceNumber();
+		void SetSequenceNumber(uint16_t seq_num);
+		uint8_t GetNPduNumber();
+		void SetNPduNumber(uint8_t n_pdu_num);
 
-// Information Element Types
+	 private:
+		Header header_;
+		std::optional<uint16_t> seq_num_ = std::nullopt;
+		std::optional<uint8_t> n_pdu_num_ = std::nullopt;
+		std::optional<std::vector<ExtHdr>> extensions_ = std::nullopt;
+		OctetBuffer payload_;
+	};
 
-enum class IeType {
-  recovery = 14,
-  tunnelEndpointIdentifierData1 = 16,
-  gsnAddress = 133,
-  extensionHeaderTypeList = 141,
-  privateExtension = 255,
-};
+	// Information Element Types
 
-class Ie {
- public:
-  Ie(IeType ie_type, bool is_tlv);
-  ~Ie();
+	enum class IeType
+	{
+		recovery = 14,
+		tunnelEndpointIdentifierData1 = 16,
+		gsnAddress = 133,
+		extensionHeaderTypeList = 141,
+		privateExtension = 255,
+	};
 
- protected:
-  uint8_t ie_type_;
-};
+	class Ie
+	{
+	 public:
+		Ie(IeType ie_type, bool is_tlv);
+		~Ie();
 
-class RecoveryIe : Ie {
- public:
-  RecoveryIe(uint8_t restart_cntr);
-  ~RecoveryIe();
+	 protected:
+		uint8_t ie_type_;
+	};
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<RecoveryIe> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+	class RecoveryIe : Ie
+	{
+	 public:
+		RecoveryIe(uint8_t restart_cntr);
+		~RecoveryIe();
 
- private:
-  uint8_t restart_cntr_;
-};
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<RecoveryIe> Decode(const OctetBuffer& pdu,
+												  OctetBuffer::OctetBufferSizeType& idx);
 
-class TunnelEndpointIdentifierData1Ie : Ie {
- public:
-  TunnelEndpointIdentifierData1Ie(uint32_t teid);
-  ~TunnelEndpointIdentifierData1Ie();
+	 private:
+		uint8_t restart_cntr_;
+	};
 
-  int Encode(OctetBuffer &buf) const;
-  static std::unique_ptr<TunnelEndpointIdentifierData1Ie> Decode(const OctetBuffer &pdu,
-    OctetBuffer::OctetBufferSizeType &idx);
+	class TunnelEndpointIdentifierData1Ie : Ie
+	{
+	 public:
+		TunnelEndpointIdentifierData1Ie(uint32_t teid);
+		~TunnelEndpointIdentifierData1Ie();
 
- private:
-  uint32_t teid_;
-};
+		int Encode(OctetBuffer& buf) const;
+		static std::unique_ptr<TunnelEndpointIdentifierData1Ie> Decode(const OctetBuffer& pdu,
+																	   OctetBuffer::OctetBufferSizeType& idx);
 
-} // namespace gtpv1u
+	 private:
+		uint32_t teid_;
+	};
+
+}// namespace gtpv1u
