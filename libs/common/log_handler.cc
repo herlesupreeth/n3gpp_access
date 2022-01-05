@@ -25,7 +25,11 @@ LogHandler::~LogHandler() {
 int LogHandler::AddLogger(const std::string &logger_name) {
   if (!logger_name.empty()) {
 	auto logger = std::make_shared<spdlog::logger>(logger_name, sinks_.begin(), sinks_.end());
-	spdlog::register_logger(logger);
+	try {
+	  spdlog::register_logger(logger);
+	} catch (spdlog::spdlog_ex &) {
+	  return -1;
+	}
 	return 0;
   }
   return -1;
