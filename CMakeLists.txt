@@ -8,6 +8,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 ########################################################################
-# Add directories
+# Include directories for include files
+########################################################################
+include_directories(libs)
+
+########################################################################
+# Add subdirectories
 ########################################################################
 add_subdirectory(libs)

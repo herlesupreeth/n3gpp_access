@@ -96,16 +96,14 @@ std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
 									   OctetBuffer::OctetBufferSizeType &idx) {
 
   if (pdu.GetLength() < (idx + 7)) {
-	// TODO: Replace with proper logging when available
-	std::cout << "Error PDU length is too short." << std::endl;
+	gtp_logger->error("Error PDU length is too short.");
 	return nullptr;
   }
 
   uint8_t flags = pdu.GetUint8(idx);
   // Check the GTP version decoded from PDU
   if (((flags >> 5) & 0x07) != 1) {
-	// TODO: Replace with proper logging when available
-	std::cout << "Unsupported GTP version." << std::endl;
+	gtp_logger->error("Unsupported GTP version.");
 	return nullptr;
   }
   // Check the Protocol Type Bit decoded from PDU (only GTP is handled not GTP')
@@ -481,15 +479,15 @@ Ie::Ie(IeType ie_type, bool is_tlv) {
 
 Ie::~Ie() = default;
 
-RecoveryIe::RecoveryIe(uint8_t restart_cntr)
-	: Ie(IeType::recovery, false), restart_cntr_(restart_cntr) {
+RecoveryIe::RecoveryIe(uint8_t restart_counter)
+	: Ie(IeType::recovery, false), restart_counter_(restart_counter) {
 }
 
 RecoveryIe::~RecoveryIe() = default;
 
 int RecoveryIe::Encode(OctetBuffer &buf) const {
   buf.AppendUint8(ie_type_);
-  buf.AppendUint8(restart_cntr_);
+  buf.AppendUint8(restart_counter_);
   return 0;
 }
 

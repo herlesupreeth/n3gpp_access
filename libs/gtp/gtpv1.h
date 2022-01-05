@@ -16,11 +16,15 @@
 #include <optional>
 #include <vector>
 
-#include "octet_buffer.h"
+#include "spdlog/spdlog.h"
+
+#include <common/octet_buffer.h>
 
 namespace gtpv1u {
 
 using common::OctetBuffer;
+
+extern std::shared_ptr<spdlog::logger> gtp_logger;
 
 enum class MessageType {
   echoRequest = 1,
@@ -242,7 +246,7 @@ class Ie {
 
 class RecoveryIe : Ie {
  public:
-  explicit RecoveryIe(uint8_t restart_cntr);
+  explicit RecoveryIe(uint8_t restart_counter);
   ~RecoveryIe();
 
   int Encode(OctetBuffer &buf) const;
@@ -250,7 +254,7 @@ class RecoveryIe : Ie {
 											OctetBuffer::OctetBufferSizeType &idx);
 
  private:
-  uint8_t restart_cntr_;
+  uint8_t restart_counter_;
 };
 
 class TunnelEndpointIdentifierData1Ie : Ie {

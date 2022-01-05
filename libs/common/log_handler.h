@@ -17,7 +17,7 @@ namespace common {
 
 class LogHandler {
  public:
-  LogHandler(const std::string &filename);
+  explicit LogHandler(const std::string &filename);
   virtual ~LogHandler();
 
   int AddLogger(const std::string &logger_name);
