@@ -10,6 +10,11 @@
 
 namespace gtpv1u {
 
+constexpr char kGtpv1LoggerName[] = "gtpv1";
+
+static std::shared_ptr<common::Logger> kGtpv1Logger = std::make_shared<common::Logger>(
+	std::string(kGtpv1LoggerName));
+
 Header::Header(MessageType message_type, uint32_t teid, uint8_t flags,
 			   uint16_t length)
 	: teid_(teid), length_(length), flags_(flags) {
@@ -96,14 +101,14 @@ std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
 									   OctetBuffer::OctetBufferSizeType &idx) {
 
   if (pdu.GetLength() < (idx + 7)) {
-	gtp_logger->error("Error PDU length is too short.");
+	kGtpv1Logger->Error("Error PDU length is too short.");
 	return nullptr;
   }
 
   uint8_t flags = pdu.GetUint8(idx);
   // Check the GTP version decoded from PDU
   if (((flags >> 5) & 0x07) != 1) {
-	gtp_logger->error("Unsupported GTP version.");
+	kGtpv1Logger->Error("Unsupported GTP version.");
 	return nullptr;
   }
   // Check the Protocol Type Bit decoded from PDU (only GTP is handled not GTP')

@@ -9,8 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(${PROJECT_NAME}
         octet_buffer.cc
-        log_handler.cc
-        )
+        logger.cc logger.h)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

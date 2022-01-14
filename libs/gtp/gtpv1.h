@@ -18,13 +18,12 @@
 
 #include "spdlog/spdlog.h"
 
+#include <common/logger.h>
 #include <common/octet_buffer.h>
 
 namespace gtpv1u {
 
 using common::OctetBuffer;
-
-extern std::shared_ptr<spdlog::logger> gtp_logger;
 
 enum class MessageType {
   echoRequest = 1,
