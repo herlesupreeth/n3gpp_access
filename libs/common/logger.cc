@@ -10,28 +10,16 @@
 
 namespace common {
 
-std::mutex Logger::sink_mutex_;
+std::shared_ptr<LogManager> LogManager::manager_ = nullptr;
+std::mutex LogManager::log_manager_mutex_;
 
-Logger::Logger(const std::string &logger_name) {
-  std::lock_guard<std::mutex> lock(sink_mutex_);
-  if (!console_sink_) {
-	console_sink_ = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-	// Set console sink to log all info or worse messages by default
-	console_sink_->set_level(spdlog::level::info);
-  }
-  if (!file_sink_) {
-	std::make_shared<spdlog::sinks::basic_file_sink_mt>(
-		log_file_name_.empty() ? "/tmp/n3gpp_access.log" : log_file_name_, false);
-	// Set file sink to log all trace or worse messages by default
-	file_sink_->set_level(spdlog::level::level_enum::trace);
-  }
-
-  std::vector<spdlog::sink_ptr> sinks{console_sink_, file_sink_};
-  base_logger_ = std::make_shared<spdlog::logger>(logger_name, sinks.begin(), sinks.end());
+Logger::Logger(const LoggerName &name, LogSinks sinks) {
+  base_logger_ = std::make_shared<spdlog::logger>(name, sinks.begin(), sinks.end());
   try {
 	spdlog::register_logger(base_logger_);
-  } catch (spdlog::spdlog_ex &) {
-	throw std::runtime_error("Logger with name [" + logger_name + "] already registered");
+  }
+  catch (spdlog::spdlog_ex &) {
+	throw std::runtime_error("Logger with name [" + name + "] already registered");
   }
 }
 
@@ -39,13 +27,18 @@ Logger::~Logger() {
   spdlog::drop(base_logger_->name());
 }
 
-int Logger::SetLogLevel(LogLevel log_level) {
-  base_logger_->set_level(spdlog::level::level_enum(log_level));
+int Logger::SetLogLevel(LogLevel level) {
+  base_logger_->set_level(spdlog::level::level_enum(level));
   return 0;
 }
 
-int Logger::SetLogFormat(const std::string &log_format) {
-  base_logger_->set_pattern(log_format);
+int Logger::SetLogFormat(const LoggerPattern &pattern) {
+  base_logger_->set_pattern(pattern);
+  return 0;
+}
+
+int Logger::SetFlushOn(LogLevel level) {
+  base_logger_->flush_on(level);
   return 0;
 }
 

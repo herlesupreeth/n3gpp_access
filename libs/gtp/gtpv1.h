@@ -6,8 +6,12 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#ifndef N3GPP_ACCESS_LIBS_GTP_GTPV1_H_
-#define N3GPP_ACCESS_LIBS_GTP_GTPV1_H_
+#pragma once
+
+#include "spdlog/spdlog.h"
+
+#include <common/logger.h>
+#include <common/octet_buffer.h>
 
 #include <cstdint>
 #include <iostream>
@@ -16,14 +20,16 @@
 #include <optional>
 #include <vector>
 
-#include "spdlog/spdlog.h"
-
-#include <common/logger.h>
-#include <common/octet_buffer.h>
-
 namespace gtpv1u {
 
 using common::OctetBuffer;
+
+#define GTPV1_LOG_TRACE(...)    LOG_TRACE("gtpv1", __VA_ARGS__)
+#define GTPV1_LOG_DEBUG(...)    LOG_DEBUG("gtpv1", __VA_ARGS__)
+#define GTPV1_LOG_INFO(...)    LOG_INFO("gtpv1", __VA_ARGS__)
+#define GTPV1_LOG_WARN(...)    LOG_WARN("gtpv1", __VA_ARGS__)
+#define GTPV1_LOG_ERR(...)    LOG_ERR("gtpv1", __VA_ARGS__)
+#define GTPV1_LOG_CRIT(...)    LOG_CRIT("gtpv1", __VA_ARGS__)
 
 enum class MessageType {
   echoRequest = 1,
@@ -270,5 +276,3 @@ class TunnelEndpointIdentifierData1Ie : Ie {
 };
 
 }// namespace gtpv1u
-
-#endif//N3GPP_ACCESS_LIBS_GTP_GTPV1_H_

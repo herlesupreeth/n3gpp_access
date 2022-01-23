@@ -6,35 +6,36 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#ifndef N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
-#define N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
+#pragma once
+
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/spdlog.h"
 
 #include <iostream>
 #include <map>
 #include <mutex>
 
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/basic_file_sink.h"
-
 namespace common {
 
-enum class LogLevel {
-  trace = spdlog::level::level_enum::trace,
-  debug = spdlog::level::level_enum::debug,
-  info = spdlog::level::level_enum::info,
-  warn = spdlog::level::level_enum::warn,
-  error = spdlog::level::level_enum::err,
-  critical = spdlog::level::level_enum::critical,
-};
+#ifdef ENABLE_TRACE_LOGGING
+	#define ENABLE_DEBUG_LOGGING
+#endif // ENABLE_TRACE_LOGGING
+
+typedef spdlog::level::level_enum LogLevel;
+typedef spdlog::sink_ptr LogSink;
+typedef std::vector<LogSink> LogSinks;
+typedef std::string LoggerName;
+typedef std::string LoggerPattern;
 
 class Logger {
  public:
-  explicit Logger(const std::string &logger_name);
+  Logger(const LoggerName &name, LogSinks sinks);
   ~Logger();
 
   int SetLogLevel(LogLevel log_level);
-  int SetLogFormat(const std::string &log_format);
+  int SetLogFormat(const LoggerPattern &pattern);
+  int SetFlushOn(LogLevel log_level);
 
   template<typename T>
   void Trace(const T &msg) {
@@ -66,15 +67,136 @@ class Logger {
 	base_logger_->critical(msg);
   }
 
- protected:
+ private:
   std::shared_ptr<spdlog::logger> base_logger_;
-
-  static std::mutex sink_mutex_;
-  static spdlog::sink_ptr console_sink_;
-  static spdlog::sink_ptr file_sink_;
-  static std::string log_file_name_;
 };
 
-}//namespace common
+class LogManager {
+ public:
+  // Allow only single instance of LogManager
+  LogManager(LogManager &other) = delete;
+  void operator=(const LogManager &) = delete;
+  ~LogManager() = default;
 
-#endif //N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
+  void Initialize(std::optional<const std::string> logfile_path) {
+	std::lock_guard<std::mutex> log_manager_lock(log_manager_mutex_);
+	if (!stdout_sink_) {
+	  stdout_sink_ = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+#ifdef ENABLE_TRACE_LOGGING
+	  stdout_sink_->set_level(LogLevel::trace);
+#elif ENABLE_DEBUG_LOGGING
+	  stdout_sink_->set_level(LogLevel::debug);
+#elif DISABLE_LOGGING
+	  stdout_sink_->set_level(LogLevel::off);
+#else
+	  stdout_sink_->set_level(LogLevel::info);
+#endif
+	}
+	if (logfile_path.has_value() && !file_sink_) {
+	  file_sink_ = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logfile_path.value(), false);
+#ifdef ENABLE_TRACE_LOGGING
+	  file_sink_->set_level(LogLevel::trace);
+#elif ENABLE_DEBUG_LOGGING
+	  file_sink_->set_level(LogLevel::debug);
+#elif DISABLE_LOGGING
+	  file_sink_->set_level(LogLevel::off);
+#else
+	  file_sink_->set_level(LogLevel::info);
+#endif
+	}
+  }
+
+  void Shutdown() {
+	spdlog::shutdown();
+  }
+
+  static std::shared_ptr<LogManager> GetInstance() {
+	std::lock_guard<std::mutex> log_manager_lock(log_manager_mutex_);
+	if (!manager_) {
+	  manager_ = std::shared_ptr<LogManager>(new LogManager());
+	}
+	return manager_;
+  }
+
+  std::shared_ptr<Logger> GetLogger(const LoggerName &name) {
+	std::lock_guard<std::mutex> log_manager_lock(log_manager_mutex_);
+	auto it = logger_name_to_logger_map_.find(name);
+	if (it == logger_name_to_logger_map_.end()) {
+	  LogSinks sinks;
+	  if (stdout_sink_) {
+		sinks.push_back(stdout_sink_);
+	  }
+	  if (file_sink_) {
+		sinks.push_back(file_sink_);
+	  }
+	  if (sinks.empty()) {
+		return nullptr;
+	  }
+	  logger_name_to_logger_map_[name] = std::make_shared<Logger>(name, sinks);
+	  // Set logger to flush upon error by default
+	  logger_name_to_logger_map_[name]->SetFlushOn(LogLevel::err);
+	  return logger_name_to_logger_map_[name];
+	}
+	return it->second;
+  }
+
+ protected:
+  LogManager() = default;
+
+ private:
+  static std::shared_ptr<LogManager> manager_;
+  static std::mutex log_manager_mutex_;
+
+  LogSink stdout_sink_;
+  LogSink file_sink_;
+
+  std::map<LoggerName, std::shared_ptr<Logger>> logger_name_to_logger_map_;
+};
+
+#ifndef DISABLE_LOGGING
+
+#ifdef ENABLE_TRACE_LOGGING
+  #define LOG_TRACE(name, ...) \
+	if (common::LogManager::GetInstance()->GetLogger(name)) { \
+		common::LogManager::GetInstance()->GetLogger(name)->Trace(__VA_ARGS__, __FILE__, __LINE__); \
+	}
+
+#ifdef ENABLE_DEBUG_LOGGING
+  #define LOG_DEBUG(name, ...) \
+	  if (common::LogManager::GetInstance()->GetLogger(name)) { \
+		  common::LogManager::GetInstance()->GetLogger(name)->Debug(__VA_ARGS__); \
+	  }
+#else // ENABLE_DEBUG_LOGGING
+	#define LOG_DEBUG(name, ...) (void)0
+#endif // ENABLE_DEBUG_LOGGING
+
+#else // ENABLE_TRACE_LOGGING
+	#define LOG_TRACE(name, ...) (void)0
+#endif // ENABLE_TRACE_LOGGING
+
+#define LOG_INFO(name, ...) \
+    if (common::LogManager::GetInstance()->GetLogger(name)) { \
+        common::LogManager::GetInstance()->GetLogger(name)->Info(__VA_ARGS__); \
+    }
+#define LOG_WARN(name, ...) \
+    if (common::LogManager::GetInstance()->GetLogger(name)) { \
+        common::LogManager::GetInstance()->GetLogger(name)->Warn(__VA_ARGS__); \
+    }
+#define LOG_ERR(name, ...) \
+    if (common::LogManager::GetInstance()->GetLogger(name)) { \
+        common::LogManager::GetInstance()->GetLogger(name)->Error(__VA_ARGS__); \
+    }
+#define LOG_CRIT(name, ...) \
+    if (common::LogManager::GetInstance()->GetLogger(name)) { \
+        common::LogManager::GetInstance()->GetLogger(name)->Critical(__VA_ARGS__); \
+    }
+#else // !DISABLE_LOGGING
+  #define LOG_TRACE(name, ...) (void)0
+  #define LOG_DEBUG(name, ...) (void)0
+  #define LOG_INFO(name, ...) (void)0
+  #define LOG_WARN(name, ...) (void)0
+  #define LOG_ERR(name, ...) (void)0
+  #define LOG_CRIT(name, ...) (void)0
+#endif // !DISABLE_LOGGING
+
+}//namespace common
