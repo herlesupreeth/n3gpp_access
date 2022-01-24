@@ -8,6 +8,6 @@
 
 #include <gtest/gtest.h>
 
-TEST(LoggerAssertTest, LoggerTestSuite) {
+TEST(LoggerTestSuite, LoggerAssertTest) {
   ASSERT_TRUE(true);
 }
