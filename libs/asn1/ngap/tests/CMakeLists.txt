@@ -13,6 +13,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC -DASN_PDU_COLLECTION)
 target_link_libraries(${PROJECT_NAME} PUBLIC asn1_common_lib asn1_ngap_lib)
 
 # Include tests
-if (BUILD_TESTING)
+if (BUILD_TESTS)
     add_subdirectory(tests)
 endif ()
