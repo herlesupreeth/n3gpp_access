@@ -24,12 +24,14 @@ namespace gtpv1u {
 
 using common::OctetBuffer;
 
-#define GTPV1_LOG_TRACE(...)    LOG_TRACE("gtpv1", __VA_ARGS__)
-#define GTPV1_LOG_DEBUG(...)    LOG_DEBUG("gtpv1", __VA_ARGS__)
-#define GTPV1_LOG_INFO(...)    LOG_INFO("gtpv1", __VA_ARGS__)
-#define GTPV1_LOG_WARN(...)    LOG_WARN("gtpv1", __VA_ARGS__)
-#define GTPV1_LOG_ERR(...)    LOG_ERR("gtpv1", __VA_ARGS__)
-#define GTPV1_LOG_CRIT(...)    LOG_CRIT("gtpv1", __VA_ARGS__)
+const std::string kGtpv1LoggerName = "gtpv1";
+
+#define GTPV1_LOG_TRACE(...)    LOG_TRACE(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_DEBUG(...)    LOG_DEBUG(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_INFO(...)    LOG_INFO(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_WARN(...)    LOG_WARN(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_ERR(...)    LOG_ERR(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_CRIT(...)    LOG_CRIT(kGtpv1LoggerName, __VA_ARGS__)
 
 enum class MessageType {
   echoRequest = 1,
