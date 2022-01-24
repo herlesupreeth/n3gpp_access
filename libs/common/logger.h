@@ -19,7 +19,7 @@
 namespace common {
 
 #ifdef ENABLE_TRACE_LOGGING
-	#define ENABLE_DEBUG_LOGGING
+#define ENABLE_DEBUG_LOGGING
 #endif // ENABLE_TRACE_LOGGING
 
 typedef spdlog::level::level_enum LogLevel;
@@ -156,22 +156,22 @@ class LogManager {
 #ifndef DISABLE_LOGGING
 
 #ifdef ENABLE_TRACE_LOGGING
-  #define LOG_TRACE(name, ...) \
-	if (common::LogManager::GetInstance()->GetLogger(name)) { \
-		common::LogManager::GetInstance()->GetLogger(name)->Trace(__VA_ARGS__, __FILE__, __LINE__); \
-	}
+#define LOG_TRACE(name, ...) \
+    if (common::LogManager::GetInstance()->GetLogger(name)) { \
+        common::LogManager::GetInstance()->GetLogger(name)->Trace(__VA_ARGS__, __FILE__, __LINE__); \
+    }
 
 #ifdef ENABLE_DEBUG_LOGGING
-  #define LOG_DEBUG(name, ...) \
-	  if (common::LogManager::GetInstance()->GetLogger(name)) { \
-		  common::LogManager::GetInstance()->GetLogger(name)->Debug(__VA_ARGS__); \
-	  }
+#define LOG_DEBUG(name, ...) \
+      if (common::LogManager::GetInstance()->GetLogger(name)) { \
+          common::LogManager::GetInstance()->GetLogger(name)->Debug(__VA_ARGS__); \
+      }
 #else // ENABLE_DEBUG_LOGGING
-	#define LOG_DEBUG(name, ...) (void)0
+#define LOG_DEBUG(name, ...) (void)0
 #endif // ENABLE_DEBUG_LOGGING
 
 #else // ENABLE_TRACE_LOGGING
-	#define LOG_TRACE(name, ...) (void)0
+#define LOG_TRACE(name, ...) (void)0
 #endif // ENABLE_TRACE_LOGGING
 
 #define LOG_INFO(name, ...) \
@@ -191,12 +191,12 @@ class LogManager {
         common::LogManager::GetInstance()->GetLogger(name)->Critical(__VA_ARGS__); \
     }
 #else // !DISABLE_LOGGING
-  #define LOG_TRACE(name, ...) (void)0
-  #define LOG_DEBUG(name, ...) (void)0
-  #define LOG_INFO(name, ...) (void)0
-  #define LOG_WARN(name, ...) (void)0
-  #define LOG_ERR(name, ...) (void)0
-  #define LOG_CRIT(name, ...) (void)0
+#define LOG_TRACE(name, ...) (void)0
+#define LOG_DEBUG(name, ...) (void)0
+#define LOG_INFO(name, ...) (void)0
+#define LOG_WARN(name, ...) (void)0
+#define LOG_ERR(name, ...) (void)0
+#define LOG_CRIT(name, ...) (void)0
 #endif // !DISABLE_LOGGING
 
 }//namespace common

@@ -86,12 +86,10 @@ int Header::Encode(OctetBuffer &buf) const {
   return 0;
 }
 
-/**
- * Decode GTPv1 header.
- * @param pdu: Octet buffer containing bytes to be decoded.
- * @param idx: Index in pdu to be updated after decoding the header.
- * @return: A unique pointer to Header object.
- */
+/// Decode GTPv1 header.
+/// \param pdu: Octet buffer containing bytes to be decoded.
+/// \param idx: Index in pdu to be updated after decoding the header.
+/// \return A unique pointer to Header object.
 std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
 									   OctetBuffer::OctetBufferSizeType &idx) {
 
@@ -472,6 +470,10 @@ int RecoveryIe::Encode(OctetBuffer &buf) const {
   return 0;
 }
 
+///
+/// \param pdu
+/// \param idx
+/// \return
 std::unique_ptr<RecoveryIe> RecoveryIe::Decode(const OctetBuffer &pdu,
 											   OctetBuffer::OctetBufferSizeType &idx) {
 
