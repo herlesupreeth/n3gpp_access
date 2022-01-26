@@ -36,9 +36,10 @@ class Logger {
   Logger(const LoggerName &name, LogSinks sinks);
   ~Logger();
 
-  int SetLogLevel(LogLevel log_level);
-  int SetLogFormat(const LoggerPattern &pattern);
-  int SetFlushOn(LogLevel log_level);
+  void SetLogLevel(LogLevel log_level);
+  void SetLogFormat(const LoggerPattern &pattern);
+  void SetFlushOn(LogLevel log_level);
+  void Flush();
 
   template<typename T>
   void Trace(const T &msg) {

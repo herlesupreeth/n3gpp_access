@@ -27,19 +27,20 @@ Logger::~Logger() {
   spdlog::drop(base_logger_->name());
 }
 
-int Logger::SetLogLevel(LogLevel level) {
-  base_logger_->set_level(spdlog::level::level_enum(level));
-  return 0;
+void Logger::SetLogLevel(LogLevel log_level) {
+  base_logger_->set_level(spdlog::level::level_enum(log_level));
 }
 
-int Logger::SetLogFormat(const LoggerPattern &pattern) {
+void Logger::SetLogFormat(const LoggerPattern &pattern) {
   base_logger_->set_pattern(pattern);
-  return 0;
 }
 
-int Logger::SetFlushOn(LogLevel level) {
-  base_logger_->flush_on(level);
-  return 0;
+void Logger::SetFlushOn(LogLevel log_level) {
+  base_logger_->flush_on(log_level);
+}
+
+void Logger::Flush() {
+  base_logger_->flush();
 }
 
 }//namespace common

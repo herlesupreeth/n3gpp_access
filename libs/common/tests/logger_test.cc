@@ -8,6 +8,10 @@
 #include <common/logger.h>
 #include <gtest/gtest.h>
 
+#include <fstream>
+
+// Test LogManager
+
 TEST(LogManagerTestSuite, LogManagerSingletonTest) {
   auto manager = common::LogManager::GetInstance();
   ASSERT_EQ(manager, common::LogManager::GetInstance());
@@ -56,7 +60,9 @@ TEST(LogManagerTestSuite, LogManagerAddLoggerTest) {
   manager->Shutdown();
 }
 
-TEST(LogManagerTestSuite, LogManagerAddLoggerAndLogOnStdoutTest) {
+// Test Logger
+
+TEST(LoggerTestSuite, LoggingOnStdoutSinkTest) {
   auto manager = common::LogManager::GetInstance();
   manager->Initialize(std::nullopt);
   auto logger = manager->GetLogger("test");
@@ -65,5 +71,22 @@ TEST(LogManagerTestSuite, LogManagerAddLoggerAndLogOnStdoutTest) {
   logger->Info("Test message");
   std::string stdout_log_message = testing::internal::GetCapturedStdout();
   ASSERT_TRUE(stdout_log_message.find("Test message") != std::string::npos);
+  manager->Shutdown();
+}
+
+TEST(LoggerTestSuite, LoggingOnFileSinkTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/logger_test.log");
+  auto logger = manager->GetLogger("test");
+  ASSERT_TRUE(logger != nullptr);
+  logger->Info("Test message");
+  logger->Flush();
+
+  std::string logged_message;
+  std::ifstream file_in("/tmp/logger_test.log");
+  ASSERT_TRUE(file_in.is_open());
+  std::getline(file_in, logged_message);
+  ASSERT_TRUE(logged_message.find("Test message") != std::string::npos);
+  file_in.close();
   manager->Shutdown();
 }
