@@ -140,6 +140,13 @@ class LogManager {
 	return it->second;
   }
 
+  [[nodiscard]] const LogSink &GetStdoutSink() const {
+	return stdout_sink_;
+  }
+  [[nodiscard]] const LogSink &GetFileSink() const {
+	return file_sink_;
+  }
+
  protected:
   LogManager() = default;
 
