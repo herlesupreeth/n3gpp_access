@@ -47,7 +47,8 @@ TEST(LogManagerTestSuite, LogManagerShutdownWithLoggerTest) {
 
 TEST(LogManagerTestSuite, LogManagerAddLoggerTest) {
   auto manager = common::LogManager::GetInstance();
-  manager->Initialize(std::nullopt);
+  manager->Initialize("/tmp/logger_test.log");
   auto logger = manager->GetLogger("test");
   ASSERT_EQ(logger, manager->GetLogger("test"));
+  manager->Shutdown();
 }

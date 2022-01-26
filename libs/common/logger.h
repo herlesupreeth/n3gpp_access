@@ -127,8 +127,7 @@ class LogManager {
 
   std::shared_ptr<Logger> GetLogger(const LoggerName &name) {
 	std::lock_guard<std::mutex> log_manager_lock(log_manager_mutex_);
-	auto it = logger_name_to_logger_map_.find(name);
-	if (it == logger_name_to_logger_map_.end()) {
+	if (logger_name_to_logger_map_.count(name) == 0) {
 	  LogSinks sinks;
 	  if (stdout_sink_) {
 		sinks.push_back(stdout_sink_);
@@ -142,9 +141,8 @@ class LogManager {
 	  logger_name_to_logger_map_[name] = std::make_shared<Logger>(name, sinks);
 	  // Set logger to flush upon error by default
 	  logger_name_to_logger_map_[name]->SetFlushOn(LogLevel::err);
-	  return logger_name_to_logger_map_[name];
 	}
-	return it->second;
+	return logger_name_to_logger_map_[name];
   }
 
   [[nodiscard]] const LogSink &GetStdoutSink() const {
