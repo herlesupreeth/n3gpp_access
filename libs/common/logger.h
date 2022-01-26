@@ -25,6 +25,11 @@ namespace common {
 #define ENABLE_DEBUG_LOGGING
 #endif // ENABLE_TRACE_LOGGING
 
+#ifdef DISABLE_LOGGING
+#undef ENABLE_TRACE_LOGGING
+#undef ENABLE_DEBUG_LOGGING
+#endif // DISABLE_LOGGING
+
 typedef spdlog::level::level_enum LogLevel;
 typedef spdlog::sink_ptr LogSink;
 typedef std::vector<LogSink> LogSinks;

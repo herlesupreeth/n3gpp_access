@@ -90,3 +90,31 @@ TEST(LoggerTestSuite, LoggingOnFileSinkTest) {
   file_in.close();
   manager->Shutdown();
 }
+
+TEST(LoggerTestSuite, NoTraceLoggingForLoggerSetToInfoTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/no_trace_logger_test.log");
+  auto logger = manager->GetLogger("test");
+  ASSERT_TRUE(logger != nullptr);
+
+  // Test stdout sink
+  testing::internal::CaptureStdout();
+
+  logger->Trace("Test message");
+  logger->Flush();
+
+  std::string stdout_log_message = testing::internal::GetCapturedStdout();
+  // Message must not be logged in stdout sink
+  ASSERT_TRUE(stdout_log_message.find("Test message") == std::string::npos);
+
+  // Test file sink
+  std::string file_logged_message;
+  std::ifstream file_in("/tmp/no_trace_logger_test.log");
+  ASSERT_TRUE(file_in.is_open());
+  std::getline(file_in, file_logged_message);
+  // Message must not be logged in file sink either
+  ASSERT_TRUE(file_logged_message.find("Test message") == std::string::npos);
+  file_in.close();
+
+  manager->Shutdown();
+}
