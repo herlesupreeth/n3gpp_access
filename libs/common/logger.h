@@ -6,7 +6,10 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#pragma once
+// SF.8: Use #include guards for all .h files - CppCoreGuidelines
+
+#ifndef N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
+#define N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
 
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -108,6 +111,7 @@ class LogManager {
 
   void Shutdown() {
 	spdlog::shutdown();
+	stdout_sink_.reset();
   }
 
   static std::shared_ptr<LogManager> GetInstance() {
@@ -207,3 +211,5 @@ class LogManager {
 #endif // !DISABLE_LOGGING
 
 }//namespace common
+
+#endif //N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_

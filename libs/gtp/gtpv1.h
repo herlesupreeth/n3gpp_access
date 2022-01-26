@@ -6,7 +6,10 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#pragma once
+// SF.8: Use #include guards for all .h files - CppCoreGuidelines
+
+#ifndef N3GPP_ACCESS_LIBS_GTP_GTPV1_H_
+#define N3GPP_ACCESS_LIBS_GTP_GTPV1_H_
 
 #include "spdlog/spdlog.h"
 
@@ -278,3 +281,5 @@ class TunnelEndpointIdentifierData1Ie : Ie {
 };
 
 }// namespace gtpv1u
+
+#endif//N3GPP_ACCESS_LIBS_GTP_GTPV1_H_

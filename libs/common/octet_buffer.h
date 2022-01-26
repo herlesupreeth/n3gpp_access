@@ -6,7 +6,10 @@
 // and subject to the terms and conditions defined in LICENSE file.
 //
 
-#pragma once
+// SF.8: Use #include guards for all .h files - CppCoreGuidelines
+
+#ifndef N3GPP_ACCESS_LIBS_COMMON_OCTET_BUFFER_H_
+#define N3GPP_ACCESS_LIBS_COMMON_OCTET_BUFFER_H_
 
 #include <cstdint>
 #include <iterator>
@@ -55,3 +58,5 @@ class OctetBuffer {
 };
 
 }// namespace common
+
+#endif//N3GPP_ACCESS_LIBS_COMMON_OCTET_BUFFER_H_
