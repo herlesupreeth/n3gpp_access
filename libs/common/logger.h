@@ -111,7 +111,10 @@ class LogManager {
 
   void Shutdown() {
 	spdlog::shutdown();
+
+	logger_name_to_logger_map_.clear();
 	stdout_sink_.reset();
+	file_sink_.reset();
   }
 
   static std::shared_ptr<LogManager> GetInstance() {
