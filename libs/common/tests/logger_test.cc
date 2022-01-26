@@ -11,12 +11,14 @@
 TEST(LogManagerTestSuite, LogManagerSingletonTest) {
   auto manager = common::LogManager::GetInstance();
   ASSERT_EQ(manager, common::LogManager::GetInstance());
+  manager->Shutdown();
 }
 
 TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutSinkOnlyTest) {
   auto manager = common::LogManager::GetInstance();
   manager->Initialize(std::nullopt);
   ASSERT_TRUE(manager->GetStdoutSink() != nullptr);
+  manager->Shutdown();
 }
 
 TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutAndFileSinkTest) {
@@ -25,6 +27,7 @@ TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutAndFileSinkTest) {
   ASSERT_TRUE(manager->GetStdoutSink() != nullptr);
   ASSERT_TRUE(manager->GetFileSink() != nullptr);
   ASSERT_TRUE(fopen("/tmp/logger_test.log", "r") != nullptr);
+  manager->Shutdown();
 }
 
 TEST(LogManagerTestSuite, LogManagerShutdownTest) {
@@ -50,5 +53,17 @@ TEST(LogManagerTestSuite, LogManagerAddLoggerTest) {
   manager->Initialize("/tmp/logger_test.log");
   auto logger = manager->GetLogger("test");
   ASSERT_EQ(logger, manager->GetLogger("test"));
+  manager->Shutdown();
+}
+
+TEST(LogManagerTestSuite, LogManagerAddLoggerAndLogOnStdoutTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize(std::nullopt);
+  auto logger = manager->GetLogger("test");
+  ASSERT_TRUE(logger != nullptr);
+  testing::internal::CaptureStdout();
+  logger->Info("Test message");
+  std::string stdout_log_message = testing::internal::GetCapturedStdout();
+  ASSERT_TRUE(stdout_log_message.find("Test message") != std::string::npos);
   manager->Shutdown();
 }
