@@ -5,9 +5,24 @@
 // The software and all associated files are licensed under GPL-3.0
 // and subject to the terms and conditions defined in LICENSE file.
 //
-
+#include <common/logger.h>
 #include <gtest/gtest.h>
 
-TEST(LoggerTestSuite, LoggerAssertTest) {
-  ASSERT_TRUE(true);
+TEST(LogManagerTestSuite, LogManagerSingletonTest) {
+  auto manager = common::LogManager::GetInstance();
+  ASSERT_EQ(manager, common::LogManager::GetInstance());
+}
+
+TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutSinkOnlyTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize(std::nullopt);
+  ASSERT_TRUE(manager->GetStdoutSink() != nullptr);
+}
+
+TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutAndFileSinkTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/logger_test.log");
+  ASSERT_TRUE(manager->GetStdoutSink() != nullptr);
+  ASSERT_TRUE(manager->GetFileSink() != nullptr);
+  ASSERT_TRUE(fopen("/tmp/logger_test.log", "r") != nullptr);
 }
