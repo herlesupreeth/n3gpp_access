@@ -26,3 +26,28 @@ TEST(LogManagerTestSuite, LogManagerInitializeWithStdoutAndFileSinkTest) {
   ASSERT_TRUE(manager->GetFileSink() != nullptr);
   ASSERT_TRUE(fopen("/tmp/logger_test.log", "r") != nullptr);
 }
+
+TEST(LogManagerTestSuite, LogManagerShutdownTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/logger_test.log");
+  manager->Shutdown();
+  ASSERT_TRUE(manager->GetStdoutSink() == nullptr);
+  ASSERT_TRUE(manager->GetFileSink() == nullptr);
+}
+
+TEST(LogManagerTestSuite, LogManagerShutdownWithLoggerTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/logger_test.log");
+  auto logger = manager->GetLogger("test");
+  ASSERT_EQ(logger, manager->GetLogger("test"));
+  manager->Shutdown();
+  ASSERT_TRUE(manager->GetStdoutSink() == nullptr);
+  ASSERT_TRUE(manager->GetFileSink() == nullptr);
+}
+
+TEST(LogManagerTestSuite, LogManagerAddLoggerTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize(std::nullopt);
+  auto logger = manager->GetLogger("test");
+  ASSERT_EQ(logger, manager->GetLogger("test"));
+}
