@@ -42,7 +42,7 @@ TEST(LogManagerTestSuite, LogManagerShutdownTest) {
   ASSERT_TRUE(manager->GetFileSink() == nullptr);
 }
 
-TEST(LogManagerTestSuite, LogManagerShutdownWithLoggerTest) {
+TEST(LogManagerTestSuite, LogManagerWithLoggerShutdownTest) {
   auto manager = common::LogManager::GetInstance();
   manager->Initialize("/tmp/logger_test.log");
   auto logger = manager->GetLogger("test");
@@ -96,6 +96,7 @@ TEST(LoggerTestSuite, NoTraceLoggingForLoggerSetToInfoTest) {
   manager->Initialize("/tmp/no_trace_logger_test.log");
   auto logger = manager->GetLogger("test");
   ASSERT_TRUE(logger != nullptr);
+  logger->SetLogLevel(common::LogLevel::info);
 
   // Test stdout sink
   testing::internal::CaptureStdout();
@@ -115,6 +116,24 @@ TEST(LoggerTestSuite, NoTraceLoggingForLoggerSetToInfoTest) {
   // Message must not be logged in file sink either
   ASSERT_TRUE(file_logged_message.find("Test message") == std::string::npos);
   file_in.close();
+
+  manager->Shutdown();
+}
+
+TEST(LoggerTestSuite, FilenameAndFunctionInLogTest) {
+  auto manager = common::LogManager::GetInstance();
+  manager->Initialize("/tmp/logger_test.log");
+  auto logger = manager->GetLogger("test");
+  ASSERT_TRUE(logger != nullptr);
+  logger->SetLogLevel(common::LogLevel::trace);
+
+  testing::internal::CaptureStdout();
+
+  LOG_DEBUG("test", "Test message")
+
+  std::string stdout_log_message = testing::internal::GetCapturedStdout();
+  // Message must not be logged in stdout sink
+  ASSERT_TRUE(stdout_log_message.find("Test message") != std::string::npos);
 
   manager->Shutdown();
 }

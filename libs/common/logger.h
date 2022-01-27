@@ -11,6 +11,15 @@
 #ifndef N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
 #define N3GPP_ACCESS_LIBS_COMMON_LOGGER_H_
 
+#ifdef ENABLE_TRACE_LOGGING
+#define ENABLE_DEBUG_LOGGING
+#endif // ENABLE_TRACE_LOGGING
+
+#ifdef DISABLE_LOGGING
+#undef ENABLE_TRACE_LOGGING
+#undef ENABLE_DEBUG_LOGGING
+#endif // DISABLE_LOGGING
+
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
@@ -20,15 +29,6 @@
 #include <mutex>
 
 namespace common {
-
-#ifdef ENABLE_TRACE_LOGGING
-#define ENABLE_DEBUG_LOGGING
-#endif // ENABLE_TRACE_LOGGING
-
-#ifdef DISABLE_LOGGING
-#undef ENABLE_TRACE_LOGGING
-#undef ENABLE_DEBUG_LOGGING
-#endif // DISABLE_LOGGING
 
 typedef spdlog::level::level_enum LogLevel;
 typedef spdlog::sink_ptr LogSink;
@@ -51,9 +51,19 @@ class Logger {
 	base_logger_->trace(msg);
   }
 
+  template<typename... Args>
+  void Trace(const std::string &msg, const std::string &file, int line) {
+	base_logger_->trace("{} [{}:{}]", msg, file, line);
+  }
+
   template<typename T>
   void Debug(const T &msg) {
 	base_logger_->debug(msg);
+  }
+
+  template<typename... Args>
+  void Debug(const std::string &msg, const std::string &file, int line) {
+	base_logger_->debug("{} [{}:{}]", msg, file, line);
   }
 
   template<typename T>
@@ -61,9 +71,19 @@ class Logger {
 	base_logger_->info(msg);
   }
 
+  template<typename... Args>
+  void Info(const std::string &msg, const std::string &file, int line) {
+	base_logger_->info("{} [{}:{}]", msg, file, line);
+  }
+
   template<typename T>
   void Warn(const T &msg) {
 	base_logger_->warn(msg);
+  }
+
+  template<typename... Args>
+  void Warn(const std::string &msg, const std::string &file, int line) {
+	base_logger_->warn("{} [{}:{}]", msg, file, line);
   }
 
   template<typename T>
@@ -71,9 +91,19 @@ class Logger {
 	base_logger_->error(msg);
   }
 
+  template<typename... Args>
+  void Error(const std::string &msg, const std::string &file, int line) {
+	base_logger_->error("{} [{}:{}]", msg, file, line);
+  }
+
   template<typename T>
   void Critical(const T &msg) {
 	base_logger_->critical(msg);
+  }
+
+  template<typename... Args>
+  void Critical(const std::string &msg, const std::string &file, int line) {
+	base_logger_->critical("{} [{}:{}]", msg, file, line);
   }
 
  private:
@@ -97,8 +127,6 @@ class LogManager {
 	  stdout_sink_->set_level(LogLevel::debug);
 #elif DISABLE_LOGGING
 	  stdout_sink_->set_level(LogLevel::off);
-#else
-	  stdout_sink_->set_level(LogLevel::info);
 #endif
 	}
 	if (logfile_path.has_value() && !file_sink_) {
@@ -109,8 +137,6 @@ class LogManager {
 	  file_sink_->set_level(LogLevel::debug);
 #elif DISABLE_LOGGING
 	  file_sink_->set_level(LogLevel::off);
-#else
-	  file_sink_->set_level(LogLevel::info);
 #endif
 	}
   }
@@ -145,8 +171,16 @@ class LogManager {
 		return nullptr;
 	  }
 	  logger_name_to_logger_map_[name] = std::make_shared<Logger>(name, sinks);
-	  // Set logger to flush upon error by default
-	  logger_name_to_logger_map_[name]->SetFlushOn(LogLevel::err);
+	  // Set logger to flush upon info by default
+	  logger_name_to_logger_map_[name]->SetFlushOn(LogLevel::info);
+	  // Set default logging level for logger
+#ifdef ENABLE_TRACE_LOGGING
+	  logger_name_to_logger_map_[name]->SetLogLevel(LogLevel::trace);
+#elif ENABLE_DEBUG_LOGGING
+	  logger_name_to_logger_map_[name]->SetLogLevel(LogLevel::debug);
+#elif DISABLE_LOGGING
+	  logger_name_to_logger_map_[name]->SetLogLevel(LogLevel::off);
+#endif
 	}
 	return logger_name_to_logger_map_[name];
   }
@@ -174,47 +208,47 @@ class LogManager {
 #ifndef DISABLE_LOGGING
 
 #ifdef ENABLE_TRACE_LOGGING
-#define LOG_TRACE(name, ...) \
+#define LOG_TRACE(name, msg, ...) \
     if (common::LogManager::GetInstance()->GetLogger(name)) { \
-        common::LogManager::GetInstance()->GetLogger(name)->Trace(__VA_ARGS__, __FILE__, __LINE__); \
+        common::LogManager::GetInstance()->GetLogger(name)->Trace(msg, __FILE__, __LINE__); \
     }
 
 #ifdef ENABLE_DEBUG_LOGGING
-#define LOG_DEBUG(name, ...) \
+#define LOG_DEBUG(name, msg, ...) \
       if (common::LogManager::GetInstance()->GetLogger(name)) { \
-          common::LogManager::GetInstance()->GetLogger(name)->Debug(__VA_ARGS__); \
+          common::LogManager::GetInstance()->GetLogger(name)->Debug(msg, __FILE__, __LINE__); \
       }
 #else // ENABLE_DEBUG_LOGGING
-#define LOG_DEBUG(name, ...) (void)0
+#define LOG_DEBUG(name, msg, ...) (void)0
 #endif // ENABLE_DEBUG_LOGGING
 
 #else // ENABLE_TRACE_LOGGING
-#define LOG_TRACE(name, ...) (void)0
+#define LOG_TRACE(name, msg, ...) (void)0
 #endif // ENABLE_TRACE_LOGGING
 
-#define LOG_INFO(name, ...) \
+#define LOG_INFO(name, msg, ...) \
     if (common::LogManager::GetInstance()->GetLogger(name)) { \
-        common::LogManager::GetInstance()->GetLogger(name)->Info(__VA_ARGS__); \
+        common::LogManager::GetInstance()->GetLogger(name)->Info(msg, __FILE__, __LINE__); \
     }
-#define LOG_WARN(name, ...) \
+#define LOG_WARN(name, msg, ...) \
     if (common::LogManager::GetInstance()->GetLogger(name)) { \
-        common::LogManager::GetInstance()->GetLogger(name)->Warn(__VA_ARGS__); \
+        common::LogManager::GetInstance()->GetLogger(name)->Warn(msg, __FILE__, __LINE__); \
     }
-#define LOG_ERR(name, ...) \
+#define LOG_ERR(name, msg, ...) \
     if (common::LogManager::GetInstance()->GetLogger(name)) { \
-        common::LogManager::GetInstance()->GetLogger(name)->Error(__VA_ARGS__); \
+        common::LogManager::GetInstance()->GetLogger(name)->Error(msg, __FILE__, __LINE__); \
     }
-#define LOG_CRIT(name, ...) \
+#define LOG_CRIT(name, msg, ...) \
     if (common::LogManager::GetInstance()->GetLogger(name)) { \
-        common::LogManager::GetInstance()->GetLogger(name)->Critical(__VA_ARGS__); \
+        common::LogManager::GetInstance()->GetLogger(name)->Critical(msg, __FILE__, __LINE__); \
     }
 #else // !DISABLE_LOGGING
-#define LOG_TRACE(name, ...) (void)0
-#define LOG_DEBUG(name, ...) (void)0
-#define LOG_INFO(name, ...) (void)0
-#define LOG_WARN(name, ...) (void)0
-#define LOG_ERR(name, ...) (void)0
-#define LOG_CRIT(name, ...) (void)0
+#define LOG_TRACE(name, msg, ...) (void)0
+#define LOG_DEBUG(name, msg, ...) (void)0
+#define LOG_INFO(name, msg, ...) (void)0
+#define LOG_WARN(name, msg, ...) (void)0
+#define LOG_ERR(name, msg, ...) (void)0
+#define LOG_CRIT(name, msg, ...) (void)0
 #endif // !DISABLE_LOGGING
 
 }//namespace common
