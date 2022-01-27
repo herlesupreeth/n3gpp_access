@@ -27,14 +27,17 @@ namespace gtpv1u {
 
 using common::OctetBuffer;
 
-const std::string kGtpv1LoggerName = "gtpv1";
+const std::string &GetGtpv1LoggerName() {
+  static std::string kGtpv1LoggerName = "gtpv1";
+  return kGtpv1LoggerName;
+}
 
-#define GTPV1_LOG_TRACE(...)    LOG_TRACE(kGtpv1LoggerName, __VA_ARGS__)
-#define GTPV1_LOG_DEBUG(...)    LOG_DEBUG(kGtpv1LoggerName, __VA_ARGS__)
-#define GTPV1_LOG_INFO(...)    LOG_INFO(kGtpv1LoggerName, __VA_ARGS__)
-#define GTPV1_LOG_WARN(...)    LOG_WARN(kGtpv1LoggerName, __VA_ARGS__)
-#define GTPV1_LOG_ERR(...)    LOG_ERR(kGtpv1LoggerName, __VA_ARGS__)
-#define GTPV1_LOG_CRIT(...)    LOG_CRIT(kGtpv1LoggerName, __VA_ARGS__)
+#define GTPV1_LOG_TRACE(msg)    LOG_TRACE(GetGtpv1LoggerName(), msg)
+#define GTPV1_LOG_DEBUG(msg)    LOG_DEBUG(GetGtpv1LoggerName(), msg)
+#define GTPV1_LOG_INFO(msg)    LOG_INFO(GetGtpv1LoggerName(), msg)
+#define GTPV1_LOG_WARN(msg)    LOG_WARN(GetGtpv1LoggerName(), msg)
+#define GTPV1_LOG_ERR(msg)    LOG_ERR(GetGtpv1LoggerName(), msg)
+#define GTPV1_LOG_CRIT(msg)    LOG_CRIT(GetGtpv1LoggerName(), msg)
 
 enum class MessageType {
   echoRequest = 1,

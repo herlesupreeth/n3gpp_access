@@ -94,14 +94,14 @@ std::unique_ptr<Header> Header::Decode(const OctetBuffer &pdu,
 									   OctetBuffer::OctetBufferSizeType &idx) {
 
   if (pdu.GetLength() < (idx + 7)) {
-	GTPV1_LOG_ERR("Error PDU length is too short.");
+	GTPV1_LOG_ERR("Error PDU length is too short.")
 	return nullptr;
   }
 
   uint8_t flags = pdu.GetUint8(idx);
   // Check the GTP version decoded from PDU
   if (((flags >> 5) & 0x07) != 1) {
-	GTPV1_LOG_ERR("Unsupported GTP version.");
+	GTPV1_LOG_ERR("Unsupported GTP version.")
 	return nullptr;
   }
   // Check the Protocol Type Bit decoded from PDU (only GTP is handled not GTP')
@@ -318,7 +318,7 @@ int BaseRanContainerExtHdr::Encode(OctetBuffer &buf) const {
 std::unique_ptr<BaseRanContainerExtHdr> BaseRanContainerExtHdr::Decode(
 	ExtHdrType ran_container_type, const OctetBuffer &pdu,
 	OctetBuffer::OctetBufferSizeType &idx) {
-  // Check for atleast Extension Header Type + length byte
+  // Check for at least Extension Header Type + length byte
   if (pdu.GetLength() < (idx + 1)) {
 	GTPV1_LOG_ERR("Error PDU length is too short.")
 	return nullptr;
@@ -360,7 +360,7 @@ RanContainerExtHdr::~RanContainerExtHdr() = default;
 std::unique_ptr<RanContainerExtHdr> RanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<RanContainerExtHdr>(
-	  static_cast<RanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
+	  reinterpret_cast<RanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
 		  ExtHdrType::ranContainer, pdu, idx)
 		  .release()));
   return res;
@@ -378,7 +378,7 @@ XwRanContainerExtHdr::~XwRanContainerExtHdr() = default;
 std::unique_ptr<XwRanContainerExtHdr> XwRanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<XwRanContainerExtHdr>(
-	  static_cast<XwRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
+	  reinterpret_cast<XwRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
 		  ExtHdrType::xwRanContainer, pdu, idx)
 		  .release()));
   return res;
@@ -396,7 +396,7 @@ NrRanContainerExtHdr::~NrRanContainerExtHdr() = default;
 std::unique_ptr<NrRanContainerExtHdr> NrRanContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
   auto res = std::unique_ptr<NrRanContainerExtHdr>(
-	  static_cast<NrRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
+	  reinterpret_cast<NrRanContainerExtHdr *>(BaseRanContainerExtHdr::Decode(
 		  ExtHdrType::nrRanContainer, pdu, idx)
 		  .release()));
   return res;
@@ -421,7 +421,7 @@ int PduSessionContainerExtHdr::Encode(OctetBuffer &buf) const {
 
 std::unique_ptr<PduSessionContainerExtHdr> PduSessionContainerExtHdr::Decode(
 	const OctetBuffer &pdu, OctetBuffer::OctetBufferSizeType &idx) {
-  // Check for atleast Extension Header Type + length byte
+  // Check for at least Extension Header Type + length byte
   if (pdu.GetLength() < (idx + 1)) {
 	GTPV1_LOG_ERR("Error PDU length is too short.")
 	return nullptr;
